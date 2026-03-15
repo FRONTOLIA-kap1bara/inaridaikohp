@@ -1,0 +1,467 @@
+---
+import "../styles/global.css";
+import type { ImageMetadata } from "astro";
+import { fetchNews } from "../lib/news";
+
+type ImageEntry = {
+  path: string;
+  name: string;
+  image: ImageMetadata;
+};
+
+const imageModules = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/raw/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}",
+  { eager: true }
+);
+
+const allImages: ImageEntry[] = Object.entries(imageModules)
+  .map(([path, module]) => ({
+    path,
+    name: path.split("/").pop() ?? "",
+    image: module.default
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const heroNames = ["hero.PNG", "hero1.PNG", "hero2.PNG", "hero3.PNG"];
+const heroImages = heroNames
+  .map((name) =>
+    allImages.find((item) => item.name.toLowerCase() === name.toLowerCase())
+  )
+  .filter((item): item is ImageEntry => Boolean(item));
+
+if (heroImages.length < 4) {
+  const fallbackImages = allImages.filter(
+    (item) =>
+      item.name.toLowerCase() !== "logo.jpg" &&
+      !heroImages.some((hero) => hero.name === item.name)
+  );
+  heroImages.push(...fallbackImages.slice(0, 4 - heroImages.length));
+}
+
+const usedImageNames = new Set(
+  [...heroImages, ...allImages.filter((img) => img.name.toLowerCase() === "logo.jpg")].map(
+    (item) => item.name.toLowerCase()
+  )
+);
+
+const galleryPool = allImages.filter(
+  (item) => !usedImageNames.has(item.name.toLowerCase())
+);
+
+const infoImages = galleryPool.slice(0, 2);
+const newsImages = galleryPool.slice(2, 4);
+const snsImages = galleryPool.slice(4, 6);
+
+const newsResult = await fetchNews();
+
+const formatDate = (value: string) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(date);
+};
+
+const getCategoryLabel = (category: unknown) => {
+  if (!category) return "お知らせ";
+  if (typeof category === "string") return category;
+  if (typeof category === "object" && "name" in category) {
+    const categoryName = category.name;
+    return typeof categoryName === "string" && categoryName ? categoryName : "お知らせ";
+  }
+  return "お知らせ";
+};
+
+const toSummary = (text: string) => {
+  const stripped = text
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return stripped.length > 140 ? `${stripped.slice(0, 140)}...` : stripped;
+};
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>威鳴太鼓 | 豊川高校和太鼓部</title>
+    <meta
+      name="description"
+      content="豊川高校和太鼓部「威鳴太鼓（いなりだいこ）」の公式情報と活動紹介。笑顔と元気で伝統の響きを届ける、和の鼓動を体感できるワンページサイト。"
+    />
+    <meta
+      name="keywords"
+      content="豊川高校,和太鼓,威鳴太鼓,いなりだいこ,愛知,演奏依頼,部活動"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="威鳴太鼓 | 豊川高校和太鼓部" />
+    <meta
+      property="og:description"
+      content="笑顔と元気で伝統の響きを。豊川高校和太鼓部「威鳴太鼓」の活動や最新情報をご紹介します。"
+    />
+    <meta property="og:image" content="/images/hero.PNG" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="/" />
+    <link rel="icon" type="image/jpeg" href="/images/logo.jpg" />
+    <link rel="apple-touch-icon" href="/images/logo.jpg" />
+    <link rel="shortcut icon" href="/images/logo.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Noto+Serif+JP:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-[var(--color-paper)] text-[var(--color-ink)]">
+    <div id="opening-curtain" class="fixed inset-0 z-[100] bg-black"></div>
+    <div id="site-root" class="opacity-0">
+      <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-md">
+        <div class="mx-auto flex w-[min(1120px,92%)] items-center justify-between py-4">
+          <a href="#home" class="flex items-center gap-3 tracking-[0.2em]">
+            <img src="/images/logo.jpg" alt="威鳴太鼓ロゴ" class="h-10 w-10 rounded-full border border-white/40 object-cover" />
+            <span class="font-title text-lg text-white sm:text-xl">威鳴太鼓</span>
+          </a>
+          <nav aria-label="メインナビゲーション">
+            <ul class="flex flex-wrap items-center justify-end gap-2 text-xs sm:gap-4 sm:text-sm">
+              <li><a class="nav-link" href="#home">HOME</a></li>
+              <li><a class="nav-link" href="#info">INFO</a></li>
+              <li><a class="nav-link" href="#news">NEWS</a></li>
+              <li><a class="nav-link" href="#sns">SNS</a></li>
+              <li><a class="nav-link" href="#contact">CONTACT</a></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      <main id="home">
+        <section class="relative min-h-screen overflow-hidden">
+          <div class="hero-slideshow" aria-hidden="true">
+            {
+              heroImages.map((entry, index) => (
+                <figure class="hero-slide" style={`--slide-index:${index};`}>
+                  <img
+                    src={entry.image.src}
+                    alt=""
+                    loading={index === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    class="h-full w-full object-cover"
+                  />
+                </figure>
+              ))
+            }
+          </div>
+          <div class="hero-overlay"></div>
+
+          <div class="relative z-10 mx-auto flex min-h-screen w-[min(1120px,92%)] items-center justify-center pt-16">
+            <div class="hero-copy max-w-4xl px-2 text-center text-white">
+              <p class="mb-4 text-sm tracking-[0.25em] text-white/85 sm:text-base">
+                豊川高校和太鼓部 威鳴太鼓
+              </p>
+              <h1 class="font-title text-4xl leading-tight sm:text-6xl" data-animate="text-reveal">
+                笑顔と元気で伝統の響きを
+              </h1>
+              <p class="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base" data-animate="fade-up">
+                心を震わせる一打を、和の誇りとともに。響きが重なるたび、会場をひとつにする威鳴太鼓の世界へ。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="info" class="section-frame">
+          <div class="section-inner">
+            <div data-animate="fade-up">
+              <p class="section-label">INFO</p>
+              <h2 class="section-title">豊川高校和太鼓部威鳴太鼓（いなりだいこ）</h2>
+              <p class="section-subtitle">笑顔と元気がモットーです！</p>
+              <div class="prose-ja">
+                <p>和太鼓演奏は、音楽とスポーツの要素を併せ持っています。</p>
+                <p>体力作りと基礎練習を積み上げ、部員全員で意気の合った演奏ができるように日々練習しています。</p>
+                <p>私たちと一緒に、和太鼓の魅力に触れてみませんか。</p>
+                <p>演奏依頼も受け付けています。</p>
+              </div>
+              <a
+                class="primary-button mt-8"
+                href="https://toyokawa.ed.jp/club/japanesedrum"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                豊川高校和太鼓部ページへ
+              </a>
+            </div>
+
+            <div class="mt-10 grid gap-6 lg:mt-0 lg:grid-cols-[1.2fr,1fr]">
+              <div class="activity-panel" data-animate="slide-right">
+                <h3 class="font-title text-2xl text-[var(--color-accent)]">活動実績</h3>
+                <ul class="mt-5 space-y-3 text-sm leading-relaxed text-white/85 sm:text-base">
+                  <li>・保育園、幼稚園、小中学校の行事</li>
+                  <li>・地域のお祭りやイベント</li>
+                  <li>・介護施設や社会福祉施設での行事</li>
+                  <li>・自治体主催の行事</li>
+                  <li>・プロバスケットボールチーム応援演奏</li>
+                  <li>・他校和太鼓部や市民チームとの合同演奏</li>
+                  <li>・など</li>
+                </ul>
+              </div>
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {
+                  infoImages.map((entry, index) => (
+                    <figure class="photo-frame" data-animate={index % 2 === 0 ? "zoom-in" : "fade-up"}>
+                      <img
+                        src={entry.image.src}
+                        alt="威鳴太鼓の活動写真"
+                        loading="lazy"
+                        decoding="async"
+                        class="parallax-image h-full w-full object-cover"
+                      />
+                    </figure>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="news" class="section-frame section-news">
+          <div class="section-inner">
+            <div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
+              <div class="grow" data-animate="fade-up">
+                <p class="section-label">NEWS</p>
+                <h2 class="section-title">最新情報</h2>
+                {
+                  newsResult.items.length > 0 ? (
+                    <div class="mt-8 grid gap-4">
+                      {newsResult.items.map((item) => (
+                        <article class="news-card" data-animate="slide-left">
+                          <div class="mb-3 flex flex-wrap items-center gap-3 text-xs text-white/75 sm:text-sm">
+                            <span class="category-pill">{getCategoryLabel(item.category)}</span>
+                            <time datetime={item.time}>{formatDate(item.time)}</time>
+                          </div>
+                          <h3 class="font-title text-xl leading-snug text-white">{item.title}</h3>
+                          <p class="mt-3 text-sm leading-relaxed text-white/85 sm:text-base">{toSummary(item.content)}</p>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <div class="news-empty mt-8" data-animate="slide-left">
+                      <p>{newsResult.message ?? "現在、ニュースは準備中です。"}</p>
+                      <p class="mt-2 text-white/70">
+                        最新情報は下記Instagramからご確認ください。
+                      </p>
+                    </div>
+                  )
+                }
+              </div>
+
+              <aside class="w-full shrink-0 lg:w-[380px]">
+                <p class="mb-4 font-title text-xl text-white" data-animate="fade-up">最新のニュースはこちら</p>
+                <div class="instagram-frame" data-animate="zoom-in">
+                  <iframe
+                    title="威鳴太鼓 Instagram"
+                    src="https://www.instagram.com/toyokawa_wadaiko/embed"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen
+                    class="h-[450px] w-full rounded-xl border border-white/15 bg-black/35"
+                  >
+                  </iframe>
+                  <a
+                    href="https://www.instagram.com/toyokawa_wadaiko"
+                    class="instagram-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Instagramを開く
+                  </a>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                  {
+                    newsImages.map((entry) => (
+                      <figure class="photo-frame h-36" data-animate="fade-up">
+                        <img
+                          src={entry.image.src}
+                          alt="威鳴太鼓ニュース関連写真"
+                          loading="lazy"
+                          decoding="async"
+                          class="h-full w-full object-cover"
+                        />
+                      </figure>
+                    ))
+                  }
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section id="sns" class="section-frame">
+          <div class="section-inner">
+            <div data-animate="fade-up">
+              <p class="section-label">SNS</p>
+              <h2 class="section-title">公式SNS</h2>
+              <div class="mt-8 grid gap-4 sm:grid-cols-2">
+                <a
+                  href="https://www.instagram.com/toyokawa_wadaiko"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="sns-card"
+                  data-animate="slide-right"
+                >
+                  <p class="font-title text-xl">Instagram</p>
+                  <p class="mt-2 text-sm text-white/80">演奏動画やイベント情報を配信中</p>
+                  <p class="mt-4 text-xs text-[var(--color-accent)] sm:text-sm">@toyokawa_wadaiko</p>
+                </a>
+                <a
+                  href="https://toyokawa.ed.jp/club/japanesedrum"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="sns-card"
+                  data-animate="slide-left"
+                >
+                  <p class="font-title text-xl">豊川高校和太鼓部紹介ページ</p>
+                  <p class="mt-2 text-sm text-white/80">学校公式サイト内の部活動紹介ページ</p>
+                  <p class="mt-4 text-xs text-[var(--color-accent)] sm:text-sm">toyokawa.ed.jp/club/japanesedrum</p>
+                </a>
+              </div>
+            </div>
+
+            <div class="mt-10 grid gap-4 sm:grid-cols-3">
+              {
+                snsImages.map((entry, index) => (
+                  <figure class={`photo-frame h-64 sm:h-72 ${index === 1 ? "sm:-translate-y-4" : ""}`} data-animate="zoom-in">
+                    <img
+                      src={entry.image.src}
+                      alt="威鳴太鼓のSNS掲載写真"
+                      loading="lazy"
+                      decoding="async"
+                      class="h-full w-full object-cover"
+                    />
+                  </figure>
+                ))
+              }
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" class="section-frame section-contact">
+          <div class="section-inner" data-animate="fade-up">
+            <p class="section-label">CONTACT</p>
+            <h2 class="section-title">お問い合わせ</h2>
+            <div class="contact-panel">
+              <p>当サイトは非公式サイトです。</p>
+              <p>このサイト内のお問い合わせはFRONTOLIAインターネットまでお寄せください。</p>
+              <p class="mt-5">
+                メール：
+                <a class="mail-link" href="mailto:contact@frontolia.com">contact@frontolia.com</a>
+              </p>
+              <p class="mt-7 text-sm leading-relaxed text-white/80 sm:text-base">
+                豊川高校和太鼓部「威鳴太鼓」への出演依頼・質問等は豊川高校へお問い合わせいただくか、InstagramのDMまでご連絡ください。
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module">
+      import { gsap } from "gsap";
+      import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      const curtain = document.querySelector("#opening-curtain");
+      const root = document.querySelector("#site-root");
+
+      const runOpening = () => {
+        if (!curtain || !root) return;
+
+        gsap.timeline()
+          .to(curtain, {
+            opacity: 0,
+            duration: 1.2,
+            ease: "power2.out"
+          })
+          .to(
+            root,
+            {
+              opacity: 1,
+              duration: 0.9,
+              ease: "power2.out",
+              onComplete: () => {
+                curtain.remove();
+              }
+            },
+            "-=0.5"
+          );
+      };
+
+      const animateSections = () => {
+        document.querySelectorAll("[data-animate]").forEach((element) => {
+          const mode = element.getAttribute("data-animate");
+
+          const base = {
+            duration: 0.9,
+            ease: "power2.out",
+            opacity: 0
+          };
+
+          const fromConfig =
+            mode === "slide-left"
+              ? { ...base, x: 42 }
+              : mode === "slide-right"
+                ? { ...base, x: -42 }
+                : mode === "zoom-in"
+                  ? { ...base, scale: 0.92 }
+                  : mode === "text-reveal"
+                    ? { ...base, y: 38, letterSpacing: "0.3em" }
+                    : { ...base, y: 30 };
+
+          gsap.from(element, {
+            ...fromConfig,
+            scrollTrigger: {
+              trigger: element,
+              start: "top 80%",
+              toggleActions: "play none none reverse"
+            }
+          });
+        });
+
+        document.querySelectorAll(".parallax-image").forEach((image) => {
+          gsap.to(image, {
+            yPercent: 10,
+            ease: "none",
+            scrollTrigger: {
+              trigger: image,
+              scrub: true
+            }
+          });
+        });
+      };
+
+      const handleNavTap = () => {
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.addEventListener("click", (event) => {
+            const href = link.getAttribute("href");
+            if (!href || !href.startsWith("#")) return;
+            const target = document.querySelector(href);
+            if (!target) return;
+            event.preventDefault();
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        });
+      };
+
+      window.addEventListener("load", () => {
+        runOpening();
+        animateSections();
+        handleNavTap();
+      });
+    </script>
+  </body>
+</html>
