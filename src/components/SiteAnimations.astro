@@ -1,4 +1,4 @@
-<script type="module">
+<script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -24,57 +24,47 @@
     }
   };
 
-  const runOpening = () => {
-    if (!curtain || !root) return;
-    root.style.opacity = "1";
-
-    gsap
-      .timeline()
-      .to(curtain, {
-        opacity: 0,
-        duration: 1.1,
-        ease: "power2.out"
-      })
-      .to(
-        root,
-        {
-          opacity: 1,
-          duration: 0.8,
-          ease: "power2.out",
-          onComplete: () => curtain.remove()
-        },
-        "-=0.45"
-      );
-  };
-
   const animateByMode = (element, mode) => {
-    const base = { duration: 1.02, ease: "power3.out", opacity: 0 };
+    const base = { duration: 0.8, ease: "power2.out", autoAlpha: 0 };
     const fromConfig =
       mode === "slide-left"
-        ? { ...base, x: 72 }
+        ? { ...base, x: 56 }
         : mode === "slide-right"
-          ? { ...base, x: -72 }
+          ? { ...base, x: -56 }
           : mode === "zoom-in"
-            ? { ...base, scale: 0.86 }
+            ? { ...base, scale: 0.9 }
             : mode === "rise-blur"
-              ? { ...base, y: 56, filter: "blur(14px)" }
+              ? { ...base, y: 30, filter: "blur(8px)" }
               : mode === "clip-up"
-                ? { ...base, y: 32, clipPath: "inset(0 0 100% 0)" }
+                ? { ...base, y: 20, clipPath: "inset(0 0 100% 0)" }
                 : mode === "rotate-in"
-                  ? { ...base, y: 28, rotation: -4, transformOrigin: "left bottom" }
+                  ? { ...base, y: 20, rotation: -3, transformOrigin: "left bottom" }
                   : mode === "text-reveal"
-                    ? { ...base, y: 44, letterSpacing: "0.32em" }
-                    : { ...base, y: 30 };
+                    ? { ...base, y: 24 }
+                    : { ...base, y: 20 };
 
-    gsap.from(element, {
-      ...fromConfig,
-      scrollTrigger: {
-        trigger: element,
-        start: "top 84%",
-        end: "bottom 20%",
-        toggleActions: "play none none reverse"
+    gsap.fromTo(
+      element,
+      fromConfig,
+      {
+        autoAlpha: 1,
+        x: 0,
+        y: 0,
+        scale: 1,
+        rotation: 0,
+        letterSpacing: "normal",
+        filter: "blur(0px)",
+        clipPath: "inset(0 0 0% 0)",
+        duration: 0.8,
+        ease: "power2.out",
+        immediateRender: false,
+        scrollTrigger: {
+          trigger: element,
+          start: "top 90%",
+          once: true
+        }
       }
-    });
+    );
   };
 
   const animateSections = () => {
@@ -84,29 +74,33 @@
     });
 
     document.querySelectorAll("[data-stagger]").forEach((group) => {
-      const children = Array.from(group.children);
+      const children = Array.from(group.children).filter((child) => !child.hasAttribute("data-animate"));
       if (!children.length) return;
 
-      gsap.from(children, {
-        opacity: 0,
-        y: 36,
-        scale: 0.97,
-        duration: 0.9,
-        ease: "power3.out",
-        stagger: 0.13,
-        scrollTrigger: {
-          trigger: group,
-          start: "top 82%",
-          end: "bottom 20%",
-          toggleActions: "play none none reverse"
+      gsap.fromTo(
+        children,
+        { autoAlpha: 0, y: 24, scale: 0.98 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.6,
+          ease: "power2.out",
+          stagger: 0.08,
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: group,
+            start: "top 90%",
+            once: true
+          }
         }
-      });
+      );
     });
 
     document.querySelectorAll(".parallax-image").forEach((image) => {
       gsap.to(image, {
-        yPercent: 10,
-        scale: 1.07,
+        yPercent: 8,
+        scale: 1.05,
         ease: "none",
         scrollTrigger: {
           trigger: image,
@@ -118,47 +112,16 @@
     });
 
     document.querySelectorAll("[data-float]").forEach((shape) => {
-      const speed = shape.getAttribute("data-float") === "fast" ? 14 : 24;
+      const speed = shape.getAttribute("data-float") === "fast" ? 14 : 22;
       gsap.to(shape, {
-        y: -28,
-        x: 20,
-        rotate: 10,
+        y: -20,
+        x: 14,
+        rotate: 8,
         repeat: -1,
         yoyo: true,
         duration: speed,
         ease: "sine.inOut"
       });
-
-      gsap.to(shape, {
-        yPercent: 24,
-        ease: "none",
-        scrollTrigger: {
-          trigger: shape.closest("section"),
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true
-        }
-      });
-    });
-
-    document.querySelectorAll(".section-frame").forEach((section) => {
-      const decor = section.querySelector(".section-decor");
-      if (!decor) return;
-
-      gsap.fromTo(
-        decor,
-        { opacity: 0.35 },
-        {
-          opacity: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 90%",
-            end: "bottom 10%",
-            scrub: true
-          }
-        }
-      );
     });
   };
 
@@ -175,13 +138,50 @@
     });
   };
 
+  const initAnimations = () => {
+    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    animateSections();
+    ScrollTrigger.refresh();
+  };
+
+  const runOpening = () => {
+    if (!curtain || !root) {
+      initAnimations();
+      return;
+    }
+    root.style.opacity = "1";
+
+    gsap
+      .timeline()
+      .to(curtain, {
+        opacity: 0,
+        duration: 1.1,
+        ease: "power2.out"
+      })
+      .to(
+        root,
+        {
+          opacity: 1,
+          duration: 0.8,
+          ease: "power2.out",
+          onComplete: () => {
+            curtain.remove();
+            initAnimations();
+          }
+        },
+        "-=0.45"
+      );
+  };
+
   onReady(() => {
     handleNavTap();
     runOpening();
-    animateSections();
   });
 
   window.setTimeout(() => {
-    if (curtain instanceof HTMLElement && curtain.style.opacity !== "0") revealFallback();
+    if (curtain instanceof HTMLElement && curtain.style.opacity !== "0") {
+      revealFallback();
+      initAnimations();
+    }
   }, 2400);
 </script>
