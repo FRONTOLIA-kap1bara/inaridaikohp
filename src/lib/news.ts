@@ -1,4 +1,5 @@
 /// <reference types="astro/client" />
+import { getSecret } from "astro:env/server";
 
 type NewsCategory = {
   id?: string;
@@ -40,12 +41,16 @@ const readEnvString = (env: unknown, key: MicroCMSEnvKey) => {
 };
 
 const resolveMicroCMSEnv = (runtimeEnv?: unknown) => {
-  const staticEnv = import.meta.env as Record<string, unknown>;
+  const secretServiceDomain = getSecret("MICROCMS_SERVICE_DOMAIN");
+  const secretApiKey = getSecret("MICROCMS_API_KEY");
+
   return {
     serviceDomain:
       readEnvString(runtimeEnv, "MICROCMS_SERVICE_DOMAIN") ??
-      readEnvString(staticEnv, "MICROCMS_SERVICE_DOMAIN"),
-    apiKey: readEnvString(runtimeEnv, "MICROCMS_API_KEY") ?? readEnvString(staticEnv, "MICROCMS_API_KEY")
+      secretServiceDomain,
+    apiKey:
+      readEnvString(runtimeEnv, "MICROCMS_API_KEY") ??
+      secretApiKey
   };
 };
 

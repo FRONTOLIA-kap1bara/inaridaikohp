@@ -73,8 +73,7 @@ fillMissingImages(infoImages, 2);
 fillMissingImages(newsImages, 2);
 fillMissingImages(snsImages, 2);
 
-const runtimeEnv = Astro.locals?.cfContext?.env;
-const newsResult = await fetchNews(undefined, runtimeEnv);
+const newsResult = await fetchNews();
 const topNewsItems = newsResult.items.slice(0, 5).map((item) => ({
   id: item.id,
   title: item.title,

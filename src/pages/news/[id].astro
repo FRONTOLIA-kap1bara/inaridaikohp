@@ -7,8 +7,7 @@ import Header from "../../components/sections/Header.astro";
 export const prerender = false;
 
 const id = Astro.params.id ?? "";
-const runtimeEnv = Astro.locals?.cfContext?.env;
-const item = await fetchNewsById(id, runtimeEnv);
+const item = await fetchNewsById(id);
 
 if (!item) {
   Astro.response.status = 404;

@@ -4,8 +4,7 @@ import { fetchNews, formatDate, getCategoryLabel, toSummary } from "../../lib/ne
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/sections/Header.astro";
 
-const runtimeEnv = Astro.locals?.cfContext?.env;
-const newsResult = await fetchNews(undefined, runtimeEnv);
+const newsResult = await fetchNews();
 const newsItems = newsResult.items.map((item) => ({
   id: item.id,
   title: item.title,
