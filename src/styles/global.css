@@ -748,12 +748,23 @@ body {
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
 }
 
+.contact-layout-wide {
+  grid-template-columns: 1fr;
+}
+
 .contact-panel {
   padding: clamp(1.2rem, 2.1vw, 1.75rem);
   background:
     linear-gradient(150deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
     rgba(15, 16, 22, 0.72);
   line-height: 1.85;
+}
+
+.contact-main-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 2rem);
 }
 
 .contact-panel-main {
@@ -822,6 +833,10 @@ body {
   .info-grid,
   .news-layout,
   .contact-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-main-row {
     grid-template-columns: 1fr;
   }
 

@@ -15,6 +15,9 @@ export type NewsItem = {
 
 type NewsResponse = {
   contents?: NewsItem[];
+  totalCount?: number;
+  limit?: number;
+  offset?: number;
 };
 
 type NewsDetailResponse = NewsItem & {
@@ -27,7 +30,7 @@ export type NewsFetchResult = {
   message?: string;
 };
 
-const DEFAULT_LIMIT = 100;
+const DEFAULT_PAGE_LIMIT = 100;
 
 const sortByNewest = (items: NewsItem[]) =>
   [...items].sort((a, b) => {
@@ -70,9 +73,9 @@ export const formatDate = (value: string) => {
   }).format(date);
 };
 
-const resolveNewsEndpoint = (serviceOrUrl: string, limit: number) => {
+const resolveNewsEndpoint = (serviceOrUrl: string, limit: number, offset = 0) => {
   const trimmed = serviceOrUrl.trim();
-  const query = `limit=${limit}&orders=-time&depth=1`;
+  const query = `limit=${limit}&offset=${offset}&orders=-time&depth=1`;
 
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
     const url = new URL(trimmed);
@@ -112,7 +115,7 @@ const resolveNewsDetailEndpoint = (serviceOrUrl: string, id: string) => {
   return `https://${domain}.microcms.io/api/v1/news/${encodedId}?${query}`;
 };
 
-export async function fetchNews(limit = DEFAULT_LIMIT): Promise<NewsFetchResult> {
+export async function fetchNews(limit?: number): Promise<NewsFetchResult> {
   const serviceDomain = import.meta.env.MICROCMS_SERVICE_DOMAIN;
   const apiKey = import.meta.env.MICROCMS_API_KEY;
 
@@ -124,30 +127,56 @@ export async function fetchNews(limit = DEFAULT_LIMIT): Promise<NewsFetchResult>
     };
   }
 
-  const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : DEFAULT_LIMIT;
-  const endpoint = resolveNewsEndpoint(serviceDomain, safeLimit);
+  const targetCount =
+    Number.isFinite(limit) && (limit as number) > 0 ? Math.floor(limit as number) : Number.POSITIVE_INFINITY;
+
+  let offset = 0;
+  let totalCount = Number.POSITIVE_INFINITY;
+  const collected: NewsItem[] = [];
 
   try {
-    const response = await fetch(endpoint, {
-      method: "GET",
-      headers: {
-        "X-MICROCMS-API-KEY": apiKey
-      }
-    });
+    while (offset < totalCount && collected.length < targetCount) {
+      const remaining = targetCount - collected.length;
+      const pageLimit = Number.isFinite(remaining)
+        ? Math.max(1, Math.min(DEFAULT_PAGE_LIMIT, remaining))
+        : DEFAULT_PAGE_LIMIT;
+      const endpoint = resolveNewsEndpoint(serviceDomain, pageLimit, offset);
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: {
+          "X-MICROCMS-API-KEY": apiKey
+        }
+      });
 
-    if (!response.ok) {
-      return {
-        items: [],
-        source: "fallback",
-        message: "ニュースの取得に失敗しました。"
-      };
+      if (!response.ok) {
+        return {
+          items: [],
+          source: "fallback",
+          message: "ニュースの取得に失敗しました。"
+        };
+      }
+
+      const json = (await response.json()) as NewsResponse;
+      const pageItems = Array.isArray(json.contents) ? json.contents : [];
+
+      if (typeof json.totalCount === "number") {
+        totalCount = json.totalCount;
+      }
+
+      if (pageItems.length === 0) {
+        break;
+      }
+
+      collected.push(...pageItems);
+      offset += pageItems.length;
+
+      if (pageItems.length < pageLimit) {
+        break;
+      }
     }
 
-    const json = (await response.json()) as NewsResponse;
-    const items = Array.isArray(json.contents) ? json.contents : [];
-
     return {
-      items: sortByNewest(items),
+      items: sortByNewest(collected),
       source: "microcms"
     };
   } catch {

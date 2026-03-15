@@ -47,6 +47,10 @@ const canonicalUrl = new URL(canonicalPath ?? Astro.url.pathname, Astro.url.orig
     <div id="opening-curtain" class="fixed inset-0 z-[100] bg-black"></div>
     <div id="site-root">
       <slot />
+      <footer class="px-4 py-6 text-center text-xs tracking-[0.08em] text-[rgba(16,16,16,0.72)]">
+        <p class="mb-2">当サイトで使用している画像等は著作権の関係上、扱いには十分注意してください。</p>
+        (c) 2026 FRONTOLIA インターネット All Rights Reserved
+      </footer>
     </div>
   </body>
 </html>
