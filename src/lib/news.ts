@@ -31,6 +31,23 @@ export type NewsFetchResult = {
 };
 
 const DEFAULT_PAGE_LIMIT = 100;
+type MicroCMSEnvKey = "MICROCMS_SERVICE_DOMAIN" | "MICROCMS_API_KEY";
+
+const readEnvString = (env: unknown, key: MicroCMSEnvKey) => {
+  if (!env || typeof env !== "object") return undefined;
+  const value = (env as Record<string, unknown>)[key];
+  return typeof value === "string" && value.trim() ? value : undefined;
+};
+
+const resolveMicroCMSEnv = (runtimeEnv?: unknown) => {
+  const staticEnv = import.meta.env as Record<string, unknown>;
+  return {
+    serviceDomain:
+      readEnvString(runtimeEnv, "MICROCMS_SERVICE_DOMAIN") ??
+      readEnvString(staticEnv, "MICROCMS_SERVICE_DOMAIN"),
+    apiKey: readEnvString(runtimeEnv, "MICROCMS_API_KEY") ?? readEnvString(staticEnv, "MICROCMS_API_KEY")
+  };
+};
 
 const sortByNewest = (items: NewsItem[]) =>
   [...items].sort((a, b) => {
@@ -115,9 +132,8 @@ const resolveNewsDetailEndpoint = (serviceOrUrl: string, id: string) => {
   return `https://${domain}.microcms.io/api/v1/news/${encodedId}?${query}`;
 };
 
-export async function fetchNews(limit?: number): Promise<NewsFetchResult> {
-  const serviceDomain = import.meta.env.MICROCMS_SERVICE_DOMAIN;
-  const apiKey = import.meta.env.MICROCMS_API_KEY;
+export async function fetchNews(limit?: number, runtimeEnv?: unknown): Promise<NewsFetchResult> {
+  const { serviceDomain, apiKey } = resolveMicroCMSEnv(runtimeEnv);
 
   if (!serviceDomain || !apiKey) {
     return {
@@ -188,9 +204,8 @@ export async function fetchNews(limit?: number): Promise<NewsFetchResult> {
   }
 }
 
-export async function fetchNewsById(id: string): Promise<NewsItem | null> {
-  const serviceDomain = import.meta.env.MICROCMS_SERVICE_DOMAIN;
-  const apiKey = import.meta.env.MICROCMS_API_KEY;
+export async function fetchNewsById(id: string, runtimeEnv?: unknown): Promise<NewsItem | null> {
+  const { serviceDomain, apiKey } = resolveMicroCMSEnv(runtimeEnv);
 
   if (!id || !serviceDomain || !apiKey) {
     return null;
