@@ -1,0 +1,47 @@
+---
+import type { ImageMetadata } from "astro";
+
+type HeroImage = {
+  name: string;
+  image: ImageMetadata;
+};
+
+interface Props {
+  heroImages: HeroImage[];
+}
+
+const { heroImages } = Astro.props;
+---
+
+<section class="relative min-h-screen overflow-hidden" id="home">
+  <div class="hero-slideshow" aria-hidden="true">
+    {
+      heroImages.map((entry, index) => (
+        <figure class="hero-slide" style={`--slide-index:${index};`}>
+          <img
+            src={entry.image.src}
+            alt=""
+            loading={index === 0 ? "eager" : "lazy"}
+            decoding="async"
+            class="h-full w-full object-cover"
+          />
+        </figure>
+      ))
+    }
+  </div>
+  <div class="hero-overlay"></div>
+
+  <div class="relative z-10 mx-auto flex min-h-screen w-[min(1120px,92%)] items-center justify-center pt-16">
+    <div class="hero-copy max-w-4xl px-2 text-center text-white">
+      <p class="mb-4 text-sm tracking-[0.25em] text-white/85 sm:text-base">
+        豊川高校和太鼓部 威鳴太鼓
+      </p>
+      <h1 class="font-title text-4xl leading-tight sm:text-6xl" data-animate="text-reveal">
+        笑顔と元気で伝統の響きを
+      </h1>
+      <p class="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base" data-animate="fade-up">
+        心を震わせる一打を、和の誇りとともに。響きが重なるたび、会場をひとつにする威鳴太鼓の世界へ。
+      </p>
+    </div>
+  </div>
+</section>

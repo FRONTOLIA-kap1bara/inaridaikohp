@@ -1,0 +1,63 @@
+---
+import type { ImageMetadata } from "astro";
+
+type SnsImage = {
+  name: string;
+  image: ImageMetadata;
+};
+
+interface Props {
+  snsImages: SnsImage[];
+}
+
+const { snsImages } = Astro.props;
+---
+
+<section id="sns" class="section-frame">
+  <div class="section-inner">
+    <div data-animate="fade-up">
+      <p class="section-label">SNS</p>
+      <h2 class="section-title">公式SNS</h2>
+      <div class="mt-8 grid gap-4 sm:grid-cols-2">
+        <a
+          href="https://www.instagram.com/toyokawa_wadaiko"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="sns-card"
+          data-animate="slide-right"
+        >
+          <p class="font-title text-xl">Instagram</p>
+          <p class="mt-2 text-sm text-white/80">演奏動画やイベント情報を配信中</p>
+          <p class="mt-4 text-xs text-[var(--color-accent)] sm:text-sm">@toyokawa_wadaiko</p>
+        </a>
+        <a
+          href="https://toyokawa.ed.jp/club/japanesedrum"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="sns-card"
+          data-animate="slide-left"
+        >
+          <p class="font-title text-xl">豊川高校和太鼓部紹介ページ</p>
+          <p class="mt-2 text-sm text-white/80">学校公式サイト内の部活動紹介ページ</p>
+          <p class="mt-4 text-xs text-[var(--color-accent)] sm:text-sm">toyokawa.ed.jp/club/japanesedrum</p>
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-10 grid gap-4 sm:grid-cols-3">
+      {
+        snsImages.map((entry, index) => (
+          <figure class={`photo-frame h-64 sm:h-72 ${index === 1 ? "sm:-translate-y-4" : ""}`} data-animate="zoom-in">
+            <img
+              src={entry.image.src}
+              alt="威鳴太鼓のSNS掲載写真"
+              loading="lazy"
+              decoding="async"
+              class="h-full w-full object-cover"
+            />
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,97 @@
+---
+import type { ImageMetadata } from "astro";
+
+type NewsImage = {
+  name: string;
+  image: ImageMetadata;
+};
+
+type ViewNewsItem = {
+  id: string;
+  title: string;
+  summary: string;
+  category: string;
+  date: string;
+  datetime: string;
+};
+
+interface Props {
+  newsItems: ViewNewsItem[];
+  newsMessage: string;
+  newsImages: NewsImage[];
+}
+
+const { newsItems, newsMessage, newsImages } = Astro.props;
+---
+
+<section id="news" class="section-frame section-news">
+  <div class="section-inner">
+    <div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
+      <div class="grow" data-animate="fade-up">
+        <p class="section-label">NEWS</p>
+        <h2 class="section-title">最新情報</h2>
+        {
+          newsItems.length > 0 ? (
+            <div class="mt-8 grid gap-4">
+              {newsItems.map((item) => (
+                <article class="news-card" data-animate="slide-left">
+                  <div class="mb-3 flex flex-wrap items-center gap-3 text-xs text-white/75 sm:text-sm">
+                    <span class="category-pill">{item.category}</span>
+                    <time datetime={item.datetime}>{item.date}</time>
+                  </div>
+                  <h3 class="font-title text-xl leading-snug text-white">{item.title}</h3>
+                  <p class="mt-3 text-sm leading-relaxed text-white/85 sm:text-base">{item.summary}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div class="news-empty mt-8" data-animate="slide-left">
+              <p>{newsMessage}</p>
+              <p class="mt-2 text-white/70">
+                最新情報は下記Instagramからご確認ください。
+              </p>
+            </div>
+          )
+        }
+      </div>
+
+      <aside class="w-full shrink-0 lg:w-[380px]">
+        <p class="mb-4 font-title text-xl text-white" data-animate="fade-up">最新のニュースはこちら</p>
+        <div class="instagram-frame" data-animate="zoom-in">
+          <iframe
+            title="威鳴太鼓 Instagram"
+            src="https://www.instagram.com/toyokawa_wadaiko/embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+            class="h-[450px] w-full rounded-xl border border-white/15 bg-black/35"
+          >
+          </iframe>
+          <a
+            href="https://www.instagram.com/toyokawa_wadaiko"
+            class="instagram-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Instagramを開く
+          </a>
+        </div>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          {
+            newsImages.map((entry) => (
+              <figure class="photo-frame h-36" data-animate="fade-up">
+                <img
+                  src={entry.image.src}
+                  alt="威鳴太鼓ニュース関連写真"
+                  loading="lazy"
+                  decoding="async"
+                  class="h-full w-full object-cover"
+                />
+              </figure>
+            ))
+          }
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,94 @@
+<script type="module">
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const curtain = document.querySelector("#opening-curtain");
+  const root = document.querySelector("#site-root");
+
+  const runOpening = () => {
+    if (!curtain || !root) return;
+
+    gsap.timeline()
+      .to(curtain, {
+        opacity: 0,
+        duration: 1.2,
+        ease: "power2.out"
+      })
+      .to(
+        root,
+        {
+          opacity: 1,
+          duration: 0.9,
+          ease: "power2.out",
+          onComplete: () => {
+            curtain.remove();
+          }
+        },
+        "-=0.5"
+      );
+  };
+
+  const animateSections = () => {
+    document.querySelectorAll("[data-animate]").forEach((element) => {
+      const mode = element.getAttribute("data-animate");
+
+      const base = {
+        duration: 0.9,
+        ease: "power2.out",
+        opacity: 0
+      };
+
+      const fromConfig =
+        mode === "slide-left"
+          ? { ...base, x: 42 }
+          : mode === "slide-right"
+            ? { ...base, x: -42 }
+            : mode === "zoom-in"
+              ? { ...base, scale: 0.92 }
+              : mode === "text-reveal"
+                ? { ...base, y: 38, letterSpacing: "0.3em" }
+                : { ...base, y: 30 };
+
+      gsap.from(element, {
+        ...fromConfig,
+        scrollTrigger: {
+          trigger: element,
+          start: "top 80%",
+          toggleActions: "play none none reverse"
+        }
+      });
+    });
+
+    document.querySelectorAll(".parallax-image").forEach((image) => {
+      gsap.to(image, {
+        yPercent: 10,
+        ease: "none",
+        scrollTrigger: {
+          trigger: image,
+          scrub: true
+        }
+      });
+    });
+  };
+
+  const handleNavTap = () => {
+    document.querySelectorAll(".nav-link").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const href = link.getAttribute("href");
+        if (!href || !href.startsWith("#")) return;
+        const target = document.querySelector(href);
+        if (!target) return;
+        event.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  };
+
+  window.addEventListener("load", () => {
+    runOpening();
+    animateSections();
+    handleNavTap();
+  });
+</script>

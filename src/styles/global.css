@@ -1,1 +1,284 @@
 @import "tailwindcss";
+
+:root {
+  --color-paper: #f3efea;
+  --color-ink: #111111;
+  --color-accent: #8f1b2b;
+  --color-accent-soft: #4d111a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Noto Serif JP", "Yu Mincho", serif;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(143, 27, 43, 0.08), transparent 38%),
+    radial-gradient(circle at 92% 14%, rgba(0, 0, 0, 0.07), transparent 34%),
+    var(--color-paper);
+  color: var(--color-ink);
+}
+
+.font-title {
+  font-family: "Shippori Mincho", "Noto Serif JP", serif;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: 0.1em;
+  transition: all 240ms ease;
+}
+
+.nav-link:hover {
+  border-color: rgba(255, 255, 255, 0.62);
+  background: rgba(143, 27, 43, 0.35);
+}
+
+.hero-slideshow {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: hero-fade 24s linear infinite;
+  animation-delay: calc(var(--slide-index) * 6s);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.36), rgba(0, 0, 0, 0.62)),
+    radial-gradient(circle at center, rgba(143, 27, 43, 0.2), transparent 60%);
+}
+
+.hero-copy h1 {
+  text-shadow: 0 10px 35px rgba(0, 0, 0, 0.65);
+}
+
+.section-frame {
+  position: relative;
+  border-top: 1px solid rgba(17, 17, 17, 0.15);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.66), rgba(243, 239, 234, 0.96)),
+    repeating-linear-gradient(
+      45deg,
+      rgba(143, 27, 43, 0.03) 0,
+      rgba(143, 27, 43, 0.03) 1px,
+      transparent 1px,
+      transparent 14px
+    );
+}
+
+.section-news {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(143, 27, 43, 0.16), transparent 35%),
+    linear-gradient(165deg, #111111, #1f1f1f);
+}
+
+.section-contact {
+  background:
+    radial-gradient(circle at 15% 18%, rgba(143, 27, 43, 0.2), transparent 40%),
+    linear-gradient(180deg, #131313, #090909);
+  color: #f8f4ef;
+}
+
+.section-inner {
+  margin-inline: auto;
+  width: min(1120px, 92%);
+  padding-block: clamp(4rem, 7vw, 6.5rem);
+}
+
+.section-label {
+  margin: 0;
+  color: var(--color-accent);
+  letter-spacing: 0.32em;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.section-title {
+  margin-top: 0.8rem;
+  margin-bottom: 0;
+  font-family: "Shippori Mincho", "Noto Serif JP", serif;
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  line-height: 1.25;
+}
+
+.section-subtitle {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  color: var(--color-accent-soft);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 700;
+}
+
+.prose-ja {
+  margin-top: 1.8rem;
+  font-size: 1rem;
+  line-height: 2;
+}
+
+.prose-ja p {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+}
+
+.activity-panel {
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background:
+    linear-gradient(145deg, rgba(17, 17, 17, 0.96), rgba(35, 35, 35, 0.92)),
+    radial-gradient(circle at 80% 20%, rgba(143, 27, 43, 0.26), transparent 46%);
+  padding: clamp(1.2rem, 2vw, 1.8rem);
+}
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(143, 27, 43, 0.95);
+  background: linear-gradient(135deg, #8f1b2b, #6c1521);
+  border-radius: 999px;
+  color: #fff8ef;
+  padding: 0.8rem 1.4rem;
+  text-decoration: none;
+  transition: transform 240ms ease, box-shadow 240ms ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.25);
+}
+
+.photo-frame {
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
+}
+
+.photo-frame img {
+  transform: scale(1.01);
+  transition: transform 500ms ease;
+}
+
+.photo-frame:hover img {
+  transform: scale(1.05);
+}
+
+.news-card,
+.news-empty,
+.sns-card,
+.contact-panel,
+.instagram-frame {
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(10, 10, 10, 0.36);
+}
+
+.news-card,
+.news-empty,
+.sns-card,
+.contact-panel {
+  padding: clamp(1.1rem, 1.7vw, 1.5rem);
+}
+
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(143, 27, 43, 0.7);
+  padding: 0.25rem 0.65rem;
+  font-weight: 700;
+}
+
+.instagram-frame {
+  padding: 0.8rem;
+}
+
+.instagram-link {
+  margin-top: 0.7rem;
+  display: inline-flex;
+  color: #ffdce1;
+  font-size: 0.9rem;
+}
+
+.sns-card {
+  display: block;
+  color: #fefcf7;
+  text-decoration: none;
+  transition: transform 220ms ease, border-color 220ms ease;
+}
+
+.sns-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.contact-panel {
+  margin-top: 1.5rem;
+  background:
+    linear-gradient(140deg, rgba(143, 27, 43, 0.22), rgba(0, 0, 0, 0.18)),
+    rgba(20, 20, 20, 0.5);
+}
+
+.mail-link {
+  color: #ffe2d3;
+}
+
+.mail-link:hover {
+  color: #ffffff;
+}
+
+@keyframes hero-fade {
+  0% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  28% {
+    opacity: 0;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-link {
+    padding: 0.35rem 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  .section-inner {
+    width: min(1100px, 94%);
+    padding-block: 3.5rem;
+  }
+}
