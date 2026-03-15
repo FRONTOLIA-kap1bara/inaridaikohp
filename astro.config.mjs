@@ -6,11 +6,16 @@ import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
+const isProductionBuild = process.env.NODE_ENV === "production";
+
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   },
-
-  output: "server",
-  adapter: cloudflare()
+  ...(isProductionBuild
+    ? {
+        output: "server",
+        adapter: cloudflare()
+      }
+    : {})
 });

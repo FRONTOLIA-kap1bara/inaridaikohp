@@ -1,14 +1,22 @@
 <script type="module">
-  import { gsap } from "gsap";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-  gsap.registerPlugin(ScrollTrigger);
-
   const curtain = document.querySelector("#opening-curtain");
   const root = document.querySelector("#site-root");
 
-  const runOpening = () => {
+  const revealFallback = () => {
+    if (root instanceof HTMLElement) {
+      root.style.opacity = "1";
+    }
+    if (curtain instanceof HTMLElement) {
+      curtain.style.opacity = "0";
+      curtain.style.visibility = "hidden";
+      curtain.style.pointerEvents = "none";
+    }
+  };
+
+  const runOpening = (gsap) => {
     if (!curtain || !root) return;
+
+    root.style.opacity = "1";
 
     gsap.timeline()
       .to(curtain, {
@@ -30,7 +38,7 @@
       );
   };
 
-  const animateSections = () => {
+  const animateSections = (gsap) => {
     document.querySelectorAll("[data-animate]").forEach((element) => {
       const mode = element.getAttribute("data-animate");
 
@@ -87,8 +95,29 @@
   };
 
   window.addEventListener("load", () => {
-    runOpening();
-    animateSections();
     handleNavTap();
   });
+
+  Promise.all([import("gsap"), import("gsap/ScrollTrigger")])
+    .then(([gsapModule, scrollTriggerModule]) => {
+      const gsap = gsapModule.gsap;
+      const ScrollTrigger = scrollTriggerModule.ScrollTrigger;
+      gsap.registerPlugin(ScrollTrigger);
+
+      window.addEventListener("load", () => {
+        runOpening(gsap);
+        animateSections(gsap);
+      });
+    })
+    .catch(() => {
+      // If animation libraries fail to load, keep the site usable.
+      window.addEventListener("load", revealFallback);
+      revealFallback();
+    });
+
+  window.setTimeout(() => {
+    if (curtain && curtain instanceof HTMLElement && curtain.style.opacity !== "0") {
+      revealFallback();
+    }
+  }, 2400);
 </script>
