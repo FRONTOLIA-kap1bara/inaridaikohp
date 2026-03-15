@@ -1,0 +1,53 @@
+﻿---
+import "../../styles/global.css";
+import { fetchNewsById, formatDate, getCategoryLabel } from "../../lib/news";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/sections/Header.astro";
+
+export const prerender = false;
+
+const id = Astro.params.id ?? "";
+const item = await fetchNewsById(id);
+
+if (!item) {
+  Astro.response.status = 404;
+}
+const title = item?.title ?? "ニュース詳細";
+const htmlContent = item?.content ?? "";
+const categoryLabel = getCategoryLabel(item?.category);
+const dateLabel = formatDate(item?.time ?? "");
+---
+
+<BaseLayout
+  title={`${title} | 豊川和太鼓 いなり太鼓`}
+  description="豊川和太鼓 いなり太鼓のニュース詳細ページです。"
+>
+  <Header />
+  <main class="news-page-main">
+    <article class="section-inner news-detail-article">
+      <div class="news-page-head">
+        <p class="section-label">NEWS DETAIL</p>
+        <h1 class="section-title">{title}</h1>
+        <div class="news-meta">
+          <span class="category-pill">{categoryLabel}</span>
+          <time datetime={item?.time}>{dateLabel}</time>
+        </div>
+      </div>
+
+      {
+        item ? (
+          <div class="news-detail-body panel-lacquer prose-ja" set:html={htmlContent}></div>
+        ) : (
+          <div class="news-detail-body panel-lacquer prose-ja">
+            <p>指定されたニュースは見つかりませんでした。</p>
+          </div>
+        )
+      }
+
+      <div class="news-detail-actions">
+        <a href="/news" class="primary-button">全てのニュースを見る</a>
+        <a href="/" class="primary-button">トップページへ戻る</a>
+      </div>
+    </article>
+  </main>
+</BaseLayout>

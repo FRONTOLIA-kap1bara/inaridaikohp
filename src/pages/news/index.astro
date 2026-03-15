@@ -1,0 +1,55 @@
+﻿---
+import "../../styles/global.css";
+import { fetchNews, formatDate, getCategoryLabel, toSummary } from "../../lib/news";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/sections/Header.astro";
+
+const newsResult = await fetchNews();
+const newsItems = newsResult.items.map((item) => ({
+  id: item.id,
+  title: item.title,
+  summary: toSummary(item.content, 20),
+  category: getCategoryLabel(item.category),
+  date: formatDate(item.time),
+  datetime: item.time
+}));
+---
+
+<BaseLayout
+  title="ニュース一覧 | 豊川和太鼓 いなり太鼓"
+  description="豊川和太鼓 いなり太鼓のニュース一覧です。"
+>
+  <Header />
+  <main class="news-page-main">
+    <div class="section-inner">
+      <div class="news-page-head">
+        <p class="section-label">NEWS</p>
+        <h1 class="section-title">全てのニュース</h1>
+        <a href="/" class="primary-button">トップページへ戻る</a>
+      </div>
+
+      {
+        newsItems.length > 0 ? (
+          <div class="news-page-list">
+            {newsItems.map((item) => (
+              <a href={`/news/${item.id}`} class="news-list-item news-card-link">
+                <article class="news-card news-card-pro">
+                  <div class="news-meta">
+                    <span class="category-pill">{item.category}</span>
+                    <time datetime={item.datetime}>{item.date}</time>
+                  </div>
+                  <h2 class="font-title text-xl leading-snug text-white">{item.title}</h2>
+                  <p class="news-summary-one-line mt-3 text-sm leading-relaxed text-white/80 sm:text-base">{item.summary}</p>
+                </article>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div class="news-card news-card-pro news-empty">
+            <p>{newsResult.message ?? "現在、ニュースは準備中です。"}</p>
+          </div>
+        )
+      }
+    </div>
+  </main>
+</BaseLayout>

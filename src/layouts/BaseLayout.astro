@@ -1,17 +1,21 @@
----
+﻿---
 interface Props {
   title: string;
   description: string;
   keywords?: string;
   ogImage?: string;
+  canonicalPath?: string;
 }
 
 const {
   title,
   description,
-  keywords = "豊川高校,和太鼓,威鳴太鼓,いなりだいこ,愛知,演奏依頼,部活動",
-  ogImage = "/images/hero.PNG"
+  keywords = "豊川和太鼓,いなり太鼓,和太鼓,活動情報,ニュース",
+  ogImage = "/images/hero.PNG",
+  canonicalPath
 } = Astro.props as Props;
+
+const canonicalUrl = new URL(canonicalPath ?? Astro.url.pathname, Astro.url.origin).toString();
 ---
 
 <html lang="ja">
@@ -28,7 +32,7 @@ const {
     <meta property="og:image" content={ogImage} />
     <meta property="og:locale" content="ja_JP" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="canonical" href="/" />
+    <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/jpeg" href="/images/logo.jpg" />
     <link rel="apple-touch-icon" href="/images/logo.jpg" />
     <link rel="shortcut icon" href="/images/logo.jpg" />

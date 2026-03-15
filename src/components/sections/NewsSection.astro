@@ -1,4 +1,4 @@
----
+﻿---
 import type { ImageMetadata } from "astro";
 
 type NewsImage = {
@@ -19,9 +19,10 @@ interface Props {
   newsItems: ViewNewsItem[];
   newsMessage: string;
   newsImages: NewsImage[];
+  hasMoreNews: boolean;
 }
 
-const { newsItems, newsMessage, newsImages } = Astro.props as Props;
+const { newsItems, newsMessage, newsImages, hasMoreNews } = Astro.props as Props;
 ---
 
 <section id="news" class="section-frame section-news">
@@ -35,9 +36,9 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
 
     <div class="section-head section-head-light" data-animate="clip-up">
       <p class="section-label">NEWS</p>
-      <h2 class="section-title">最新情報</h2>
+      <h2 class="section-title">最新ニュース</h2>
       <p class="section-intro">
-        直近の出演情報や活動報告を掲載しています。最新情報はInstagramでもリアルタイムで更新しています。
+        お知らせを最新順で表示しています。タイトルまたは本文の抜粋をクリックすると詳細ページで全文を確認できます。
       </p>
     </div>
 
@@ -46,29 +47,38 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
         {
           newsItems.length > 0 ? (
             newsItems.map((item, index) => (
-              <article class="news-card news-card-pro" data-animate={index % 2 === 0 ? "slide-right" : "slide-left"}>
-                <div class="news-meta">
-                  <span class="category-pill">{item.category}</span>
-                  <time datetime={item.datetime}>{item.date}</time>
-                </div>
-                <h3 class="font-title text-xl leading-snug text-white">{item.title}</h3>
-                <p class="mt-3 text-sm leading-relaxed text-white/80 sm:text-base">{item.summary}</p>
-              </article>
+              <a href={`/news/${item.id}`} class="news-card-link" data-animate={index % 2 === 0 ? "slide-right" : "slide-left"}>
+                <article class="news-card news-card-pro">
+                  <div class="news-meta">
+                    <span class="category-pill">{item.category}</span>
+                    <time datetime={item.datetime}>{item.date}</time>
+                  </div>
+                  <h3 class="font-title text-xl leading-snug text-white">{item.title}</h3>
+                  <p class="news-summary-one-line mt-3 text-sm leading-relaxed text-white/80 sm:text-base">{item.summary}</p>
+                </article>
+              </a>
             ))
           ) : (
             <div class="news-empty news-card-pro" data-animate="fade-up">
               <p>{newsMessage}</p>
-              <p class="mt-2 text-white/70">最新情報は下記Instagramからご確認ください。</p>
             </div>
           )
+        }
+
+        {
+          hasMoreNews ? (
+            <div class="mt-2" data-animate="fade-up">
+              <a class="primary-button" href="/news">全てのニュースを見る</a>
+            </div>
+          ) : null
         }
       </div>
 
       <aside class="news-side" data-animate="slide-left">
-        <p class="mb-4 font-title text-xl text-white">最新のニュースはこちら</p>
+        <p class="mb-4 font-title text-xl text-white">SNSでも更新中</p>
         <div class="instagram-frame">
           <iframe
-            title="威鳴太鼓 Instagram"
+            title="豊川和太鼓 Instagram"
             src="https://www.instagram.com/toyokawa_wadaiko/embed"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
@@ -94,7 +104,7 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
           <figure class={`photo-frame news-photo framed-photo ${index === 0 ? "news-photo-wide" : ""}`} data-animate="clip-up">
             <img
               src={entry.image.src}
-              alt="威鳴太鼓ニュース関連写真"
+              alt="豊川和太鼓ニュース関連写真"
               loading="lazy"
               decoding="async"
               class="h-full w-full object-cover"

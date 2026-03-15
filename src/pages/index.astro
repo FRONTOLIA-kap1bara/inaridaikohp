@@ -1,7 +1,7 @@
----
+﻿---
 import "../styles/global.css";
 import type { ImageMetadata } from "astro";
-import { fetchNews } from "../lib/news";
+import { fetchNews, formatDate, getCategoryLabel, toSummary } from "../lib/news";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/sections/Header.astro";
 import HeroSection from "../components/sections/HeroSection.astro";
@@ -73,57 +73,34 @@ fillMissingImages(infoImages, 2);
 fillMissingImages(newsImages, 2);
 fillMissingImages(snsImages, 2);
 
-const formatDate = (value: string) => {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(date);
-};
-
-const getCategoryLabel = (category: unknown) => {
-  if (!category) return "お知らせ";
-  if (typeof category === "string") return category;
-  if (typeof category === "object" && "name" in category) {
-    const categoryName = category.name;
-    return typeof categoryName === "string" && categoryName ? categoryName : "お知らせ";
-  }
-  return "お知らせ";
-};
-
-const toSummary = (text: string) => {
-  const stripped = text
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  return stripped.length > 140 ? `${stripped.slice(0, 140)}...` : stripped;
-};
-
 const newsResult = await fetchNews();
-const newsItems = newsResult.items.map((item) => ({
+const topNewsItems = newsResult.items.slice(0, 5).map((item) => ({
   id: item.id,
   title: item.title,
-  summary: toSummary(item.content),
+  summary: toSummary(item.content, 20),
   category: getCategoryLabel(item.category),
   date: formatDate(item.time),
   datetime: item.time
 }));
+
+const hasMoreNews = newsResult.items.length > 5;
 const newsMessage = newsResult.message ?? "現在、ニュースは準備中です。";
 ---
 
 <BaseLayout
-  title="威鳴太鼓 | 豊川高校和太鼓部"
-  description="豊川高校和太鼓部「威鳴太鼓（いなりだいこ）」の公式情報と活動紹介。笑顔と元気で伝統の響きを届ける、和の鼓動を体感できるワンページサイト。"
+  title="豊川和太鼓 | いなり太鼓"
+  description="愛知県豊川市を拠点に活動する和太鼓チーム『いなり太鼓』の公式サイトです。最新ニュースや活動情報をご覧いただけます。"
 >
   <Header />
   <main>
     <HeroSection heroImages={heroImages} />
     <InfoSection infoImages={infoImages} />
-    <NewsSection newsItems={newsItems} newsMessage={newsMessage} newsImages={newsImages} />
+    <NewsSection
+      newsItems={topNewsItems}
+      newsMessage={newsMessage}
+      newsImages={newsImages}
+      hasMoreNews={hasMoreNews}
+    />
     <SnsSection snsImages={snsImages} />
     <ContactSection />
   </main>
