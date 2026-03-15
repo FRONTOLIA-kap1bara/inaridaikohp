@@ -18,6 +18,8 @@ const { infoImages } = Astro.props as Props;
     <div class="section-decor">
       <span class="decor-orb decor-orb-a" data-float="slow"></span>
       <span class="decor-orb decor-orb-b" data-float="fast"></span>
+      <span class="decor-ring decor-ring-a" data-float="slow"></span>
+      <span class="decor-pill decor-pill-a" data-float="fast"></span>
       <span class="decor-grid"></span>
     </div>
 
@@ -62,7 +64,7 @@ const { infoImages } = Astro.props as Props;
       </aside>
     </div>
 
-    <div class="info-gallery" data-stagger="gallery">
+    <div class={`info-gallery info-gallery-${Math.min(infoImages.length, 2) || 1}`} data-stagger="gallery">
       {
         infoImages.map((entry, index) => (
           <figure

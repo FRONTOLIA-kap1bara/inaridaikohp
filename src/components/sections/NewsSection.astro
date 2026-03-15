@@ -28,6 +28,8 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
   <div class="section-inner">
     <div class="section-decor">
       <span class="decor-orb decor-orb-c" data-float="slow"></span>
+      <span class="decor-ring decor-ring-b" data-float="fast"></span>
+      <span class="decor-pill decor-pill-b" data-float="slow"></span>
       <span class="decor-line"></span>
     </div>
 
@@ -86,7 +88,7 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
       </aside>
     </div>
 
-    <div class="news-photo-ribbon" data-stagger="gallery">
+    <div class={`news-photo-ribbon news-photo-ribbon-${Math.min(newsImages.length, 2) || 1}`} data-stagger="gallery">
       {
         newsImages.map((entry, index) => (
           <figure class={`photo-frame news-photo framed-photo ${index === 0 ? "news-photo-wide" : ""}`} data-animate="clip-up">
