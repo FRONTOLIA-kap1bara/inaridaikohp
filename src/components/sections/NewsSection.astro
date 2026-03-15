@@ -26,45 +26,52 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
 
 <section id="news" class="section-frame section-news">
   <div class="section-inner">
-    <div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
-      <div class="grow" data-animate="fade-up">
-        <p class="section-label">NEWS</p>
-        <h2 class="section-title">最新情報</h2>
+    <div class="section-decor">
+      <span class="decor-orb decor-orb-c" data-float="slow"></span>
+      <span class="decor-line"></span>
+    </div>
+
+    <div class="section-head section-head-light" data-animate="clip-up">
+      <p class="section-label">NEWS</p>
+      <h2 class="section-title">最新情報</h2>
+      <p class="section-intro">
+        直近の出演情報や活動報告を掲載しています。最新情報はInstagramでもリアルタイムで更新しています。
+      </p>
+    </div>
+
+    <div class="news-layout">
+      <div class="news-feed" data-stagger="news">
         {
           newsItems.length > 0 ? (
-            <div class="mt-8 grid gap-4">
-              {newsItems.map((item) => (
-                <article class="news-card" data-animate="slide-left">
-                  <div class="mb-3 flex flex-wrap items-center gap-3 text-xs text-white/75 sm:text-sm">
-                    <span class="category-pill">{item.category}</span>
-                    <time datetime={item.datetime}>{item.date}</time>
-                  </div>
-                  <h3 class="font-title text-xl leading-snug text-white">{item.title}</h3>
-                  <p class="mt-3 text-sm leading-relaxed text-white/85 sm:text-base">{item.summary}</p>
-                </article>
-              ))}
-            </div>
+            newsItems.map((item, index) => (
+              <article class="news-card news-card-pro" data-animate={index % 2 === 0 ? "slide-right" : "slide-left"}>
+                <div class="news-meta">
+                  <span class="category-pill">{item.category}</span>
+                  <time datetime={item.datetime}>{item.date}</time>
+                </div>
+                <h3 class="font-title text-xl leading-snug text-white">{item.title}</h3>
+                <p class="mt-3 text-sm leading-relaxed text-white/80 sm:text-base">{item.summary}</p>
+              </article>
+            ))
           ) : (
-            <div class="news-empty mt-8" data-animate="slide-left">
+            <div class="news-empty news-card-pro" data-animate="fade-up">
               <p>{newsMessage}</p>
-              <p class="mt-2 text-white/70">
-                最新情報は下記Instagramからご確認ください。
-              </p>
+              <p class="mt-2 text-white/70">最新情報は下記Instagramからご確認ください。</p>
             </div>
           )
         }
       </div>
 
-      <aside class="w-full shrink-0 lg:w-[380px]">
-        <p class="mb-4 font-title text-xl text-white" data-animate="fade-up">最新のニュースはこちら</p>
-        <div class="instagram-frame" data-animate="zoom-in">
+      <aside class="news-side" data-animate="slide-left">
+        <p class="mb-4 font-title text-xl text-white">最新のニュースはこちら</p>
+        <div class="instagram-frame">
           <iframe
             title="威鳴太鼓 Instagram"
             src="https://www.instagram.com/toyokawa_wadaiko/embed"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
             allowfullscreen
-            class="h-[450px] w-full rounded-xl border border-white/15 bg-black/35"
+            class="h-[480px] w-full rounded-xl border border-white/15 bg-black/35"
           >
           </iframe>
           <a
@@ -76,22 +83,23 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
             Instagramを開く
           </a>
         </div>
-        <div class="mt-4 grid grid-cols-2 gap-3">
-          {
-            newsImages.map((entry) => (
-              <figure class="photo-frame h-36" data-animate="fade-up">
-                <img
-                  src={entry.image.src}
-                  alt="威鳴太鼓ニュース関連写真"
-                  loading="lazy"
-                  decoding="async"
-                  class="h-full w-full object-cover"
-                />
-              </figure>
-            ))
-          }
-        </div>
       </aside>
+    </div>
+
+    <div class="news-photo-ribbon" data-stagger="gallery">
+      {
+        newsImages.map((entry, index) => (
+          <figure class={`photo-frame news-photo framed-photo ${index === 0 ? "news-photo-wide" : ""}`} data-animate="clip-up">
+            <img
+              src={entry.image.src}
+              alt="威鳴太鼓ニュース関連写真"
+              loading="lazy"
+              decoding="async"
+              class="h-full w-full object-cover"
+            />
+          </figure>
+        ))
+      }
     </div>
   </div>
 </section>

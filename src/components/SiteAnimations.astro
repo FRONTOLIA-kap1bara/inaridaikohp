@@ -3,13 +3,19 @@
   const root = document.querySelector("#site-root");
 
   const revealFallback = () => {
-    if (root instanceof HTMLElement) {
-      root.style.opacity = "1";
-    }
+    if (root instanceof HTMLElement) root.style.opacity = "1";
     if (curtain instanceof HTMLElement) {
       curtain.style.opacity = "0";
       curtain.style.visibility = "hidden";
       curtain.style.pointerEvents = "none";
+    }
+  };
+
+  const onReady = (callback) => {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", callback, { once: true });
+    } else {
+      callback();
     }
   };
 
@@ -18,52 +24,70 @@
 
     root.style.opacity = "1";
 
-    gsap.timeline()
+    gsap
+      .timeline()
       .to(curtain, {
         opacity: 0,
-        duration: 1.2,
+        duration: 1.1,
         ease: "power2.out"
       })
       .to(
         root,
         {
           opacity: 1,
-          duration: 0.9,
+          duration: 0.8,
           ease: "power2.out",
-          onComplete: () => {
-            curtain.remove();
-          }
+          onComplete: () => curtain.remove()
         },
-        "-=0.5"
+        "-=0.45"
       );
   };
 
   const animateSections = (gsap) => {
     document.querySelectorAll("[data-animate]").forEach((element) => {
       const mode = element.getAttribute("data-animate");
-
-      const base = {
-        duration: 0.9,
-        ease: "power2.out",
-        opacity: 0
-      };
+      const base = { duration: 0.9, ease: "power2.out", opacity: 0 };
 
       const fromConfig =
         mode === "slide-left"
-          ? { ...base, x: 42 }
+          ? { ...base, x: 56 }
           : mode === "slide-right"
-            ? { ...base, x: -42 }
+            ? { ...base, x: -56 }
             : mode === "zoom-in"
-              ? { ...base, scale: 0.92 }
-              : mode === "text-reveal"
-                ? { ...base, y: 38, letterSpacing: "0.3em" }
-                : { ...base, y: 30 };
+              ? { ...base, scale: 0.9 }
+              : mode === "rise-blur"
+                ? { ...base, y: 48, filter: "blur(12px)" }
+                : mode === "clip-up"
+                  ? { ...base, y: 22, clipPath: "inset(0 0 100% 0)" }
+                  : mode === "rotate-in"
+                    ? { ...base, y: 24, rotation: -3, transformOrigin: "left bottom" }
+                    : mode === "text-reveal"
+                      ? { ...base, y: 38, letterSpacing: "0.3em" }
+                      : { ...base, y: 28 };
 
       gsap.from(element, {
         ...fromConfig,
         scrollTrigger: {
           trigger: element,
-          start: "top 80%",
+          start: "top 84%",
+          toggleActions: "play none none reverse"
+        }
+      });
+    });
+
+    document.querySelectorAll("[data-stagger]").forEach((group) => {
+      const children = Array.from(group.children);
+      if (!children.length) return;
+
+      gsap.from(children, {
+        opacity: 0,
+        y: 28,
+        duration: 0.75,
+        ease: "power2.out",
+        stagger: 0.12,
+        scrollTrigger: {
+          trigger: group,
+          start: "top 82%",
           toggleActions: "play none none reverse"
         }
       });
@@ -71,10 +95,33 @@
 
     document.querySelectorAll(".parallax-image").forEach((image) => {
       gsap.to(image, {
-        yPercent: 10,
+        yPercent: 8,
+        scale: 1.05,
         ease: "none",
         scrollTrigger: {
           trigger: image,
+          scrub: true
+        }
+      });
+    });
+
+    document.querySelectorAll("[data-float]").forEach((shape) => {
+      const speed = shape.getAttribute("data-float") === "fast" ? 18 : 30;
+      gsap.to(shape, {
+        y: -26,
+        x: 16,
+        rotate: 8,
+        repeat: -1,
+        yoyo: true,
+        duration: speed,
+        ease: "sine.inOut"
+      });
+
+      gsap.to(shape, {
+        yPercent: 18,
+        ease: "none",
+        scrollTrigger: {
+          trigger: shape.closest("section"),
           scrub: true
         }
       });
@@ -94,30 +141,26 @@
     });
   };
 
-  window.addEventListener("load", () => {
-    handleNavTap();
-  });
-
   Promise.all([import("gsap"), import("gsap/ScrollTrigger")])
     .then(([gsapModule, scrollTriggerModule]) => {
       const gsap = gsapModule.gsap;
       const ScrollTrigger = scrollTriggerModule.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
 
-      window.addEventListener("load", () => {
+      onReady(() => {
+        handleNavTap();
         runOpening(gsap);
         animateSections(gsap);
       });
     })
     .catch(() => {
-      // If animation libraries fail to load, keep the site usable.
-      window.addEventListener("load", revealFallback);
-      revealFallback();
+      onReady(() => {
+        handleNavTap();
+        revealFallback();
+      });
     });
 
   window.setTimeout(() => {
-    if (curtain && curtain instanceof HTMLElement && curtain.style.opacity !== "0") {
-      revealFallback();
-    }
+    if (curtain instanceof HTMLElement && curtain.style.opacity !== "0") revealFallback();
   }, 2400);
 </script>

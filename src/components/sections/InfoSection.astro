@@ -13,32 +13,44 @@ interface Props {
 const { infoImages } = Astro.props as Props;
 ---
 
-<section id="info" class="section-frame">
+<section id="info" class="section-frame section-info">
   <div class="section-inner">
-    <div data-animate="fade-up">
+    <div class="section-decor">
+      <span class="decor-orb decor-orb-a" data-float="slow"></span>
+      <span class="decor-orb decor-orb-b" data-float="fast"></span>
+      <span class="decor-grid"></span>
+    </div>
+
+    <div class="section-head" data-animate="clip-up">
       <p class="section-label">INFO</p>
       <h2 class="section-title">豊川高校和太鼓部威鳴太鼓（いなりだいこ）</h2>
       <p class="section-subtitle">笑顔と元気がモットーです！</p>
-      <div class="prose-ja">
-        <p>和太鼓演奏は、音楽とスポーツの要素を併せ持っています。</p>
-        <p>体力作りと基礎練習を積み上げ、部員全員で意気の合った演奏ができるように日々練習しています。</p>
-        <p>私たちと一緒に、和太鼓の魅力に触れてみませんか。</p>
-        <p>演奏依頼も受け付けています。</p>
-      </div>
-      <a
-        class="primary-button mt-8"
-        href="https://toyokawa.ed.jp/club/japanesedrum"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        豊川高校和太鼓部ページへ
-      </a>
+      <p class="section-intro">
+        受け継がれる伝統に、現代の熱量を重ねる。音と気迫で会場をひとつにする和太鼓ステージを届けます。
+      </p>
     </div>
 
-    <div class="mt-10 grid gap-6 lg:mt-0 lg:grid-cols-[1.2fr,1fr]">
-      <div class="activity-panel" data-animate="slide-right">
-        <h3 class="font-title text-2xl text-[var(--color-accent)]">活動実績</h3>
-        <ul class="mt-5 space-y-3 text-sm leading-relaxed text-white/85 sm:text-base">
+    <div class="info-grid">
+      <article class="panel-lacquer info-story" data-animate="rise-blur">
+        <div class="prose-ja">
+          <p>和太鼓演奏は、音楽とスポーツの要素を併せ持っています。</p>
+          <p>体力作りと基礎練習を積み上げ、部員全員で意気の合った演奏ができるように日々練習しています。</p>
+          <p>私たちと一緒に、和太鼓の魅力に触れてみませんか。</p>
+          <p>演奏依頼も受け付けています。</p>
+        </div>
+        <a
+          class="primary-button mt-8"
+          href="https://toyokawa.ed.jp/club/japanesedrum"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          豊川高校和太鼓部ページへ
+        </a>
+      </article>
+
+      <aside class="activity-panel panel-lacquer panel-dark" data-animate="slide-left">
+        <h3 class="font-title text-2xl text-[var(--color-gold)]">活動実績</h3>
+        <ul class="achievement-list" data-stagger="list">
           <li>・保育園、幼稚園、小中学校の行事</li>
           <li>・地域のお祭りやイベント</li>
           <li>・介護施設や社会福祉施設での行事</li>
@@ -47,22 +59,46 @@ const { infoImages } = Astro.props as Props;
           <li>・他校和太鼓部や市民チームとの合同演奏</li>
           <li>・など</li>
         </ul>
-      </div>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {
-          infoImages.map((entry, index) => (
-            <figure class="photo-frame" data-animate={index % 2 === 0 ? "zoom-in" : "fade-up"}>
-              <img
-                src={entry.image.src}
-                alt="威鳴太鼓の活動写真"
-                loading="lazy"
-                decoding="async"
-                class="parallax-image h-full w-full object-cover"
-              />
-            </figure>
-          ))
-        }
-      </div>
+      </aside>
+    </div>
+
+    <div class="info-gallery" data-stagger="gallery">
+      {
+        infoImages.map((entry, index) => (
+          <figure
+            class={`photo-frame info-photo framed-photo ${index === 0 ? "info-photo-lead" : "info-photo-sub"}`}
+            data-animate={index === 0 ? "clip-up" : "rotate-in"}
+          >
+            <img
+              src={entry.image.src}
+              alt="威鳴太鼓の活動写真"
+              loading="lazy"
+              decoding="async"
+              class="parallax-image h-full w-full object-cover"
+            />
+          </figure>
+        ))
+      }
+      {
+        infoImages.length === 1 && (
+          <figure class="photo-frame info-photo info-photo-sub framed-photo" data-animate="zoom-in">
+            <img
+              src={infoImages[0].image.src}
+              alt="威鳴太鼓の活動写真"
+              loading="lazy"
+              decoding="async"
+              class="parallax-image h-full w-full object-cover"
+            />
+          </figure>
+        )
+      }
+      {
+        infoImages.length === 0 && (
+          <div class="panel-lacquer info-gallery-fallback" data-animate="fade-up">
+            <p>活動写真は準備中です。</p>
+          </div>
+        )
+      }
     </div>
   </div>
 </section>

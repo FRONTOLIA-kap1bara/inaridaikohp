@@ -13,41 +13,52 @@ interface Props {
 const { snsImages } = Astro.props as Props;
 ---
 
-<section id="sns" class="section-frame">
+<section id="sns" class="section-frame section-sns">
   <div class="section-inner">
-    <div data-animate="fade-up">
-      <p class="section-label">SNS</p>
-      <h2 class="section-title">公式SNS</h2>
-      <div class="mt-8 grid gap-4 sm:grid-cols-2">
-        <a
-          href="https://www.instagram.com/toyokawa_wadaiko"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="sns-card"
-          data-animate="slide-right"
-        >
-          <p class="font-title text-xl">Instagram</p>
-          <p class="mt-2 text-sm text-white/80">演奏動画やイベント情報を配信中</p>
-          <p class="mt-4 text-xs text-[var(--color-accent)] sm:text-sm">@toyokawa_wadaiko</p>
-        </a>
-        <a
-          href="https://toyokawa.ed.jp/club/japanesedrum"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="sns-card"
-          data-animate="slide-left"
-        >
-          <p class="font-title text-xl">豊川高校和太鼓部紹介ページ</p>
-          <p class="mt-2 text-sm text-white/80">学校公式サイト内の部活動紹介ページ</p>
-          <p class="mt-4 text-xs text-[var(--color-accent)] sm:text-sm">toyokawa.ed.jp/club/japanesedrum</p>
-        </a>
-      </div>
+    <div class="section-decor">
+      <span class="decor-orb decor-orb-d" data-float="fast"></span>
+      <span class="decor-grid"></span>
     </div>
 
-    <div class="mt-10 grid gap-4 sm:grid-cols-3">
+    <div class="section-head" data-animate="clip-up">
+      <p class="section-label">SNS</p>
+      <h2 class="section-title">公式SNS</h2>
+      <p class="section-intro">
+        ステージの熱量を日常へ。動画・写真・出演案内は公式SNSで発信しています。
+      </p>
+    </div>
+
+    <div class="sns-links" data-stagger="links">
+      <a
+        href="https://www.instagram.com/toyokawa_wadaiko"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="sns-card sns-card-ig"
+        data-animate="rise-blur"
+      >
+        <p class="sns-tag">OFFICIAL INSTAGRAM</p>
+        <p class="font-title text-2xl">Instagram</p>
+        <p class="mt-3 text-sm text-[#f2efe8]/85">演奏動画やイベント情報を配信中</p>
+        <p class="mt-6 text-sm text-[var(--color-gold)]">@toyokawa_wadaiko</p>
+      </a>
+      <a
+        href="https://toyokawa.ed.jp/club/japanesedrum"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="sns-card sns-card-school"
+        data-animate="rise-blur"
+      >
+        <p class="sns-tag">SCHOOL PAGE</p>
+        <p class="font-title text-2xl">豊川高校和太鼓部紹介ページ</p>
+        <p class="mt-3 text-sm text-[#f2efe8]/85">学校公式サイト内の部活動紹介ページ</p>
+        <p class="mt-6 text-sm text-[var(--color-gold)]">toyokawa.ed.jp/club/japanesedrum</p>
+      </a>
+    </div>
+
+    <div class="sns-gallery" data-stagger="gallery">
       {
         snsImages.map((entry, index) => (
-          <figure class={`photo-frame h-64 sm:h-72 ${index === 1 ? "sm:-translate-y-4" : ""}`} data-animate="zoom-in">
+          <figure class={`photo-frame sns-photo framed-photo ${index === 1 ? "sns-photo-tall" : ""}`} data-animate="zoom-in">
             <img
               src={entry.image.src}
               alt="威鳴太鼓のSNS掲載写真"
