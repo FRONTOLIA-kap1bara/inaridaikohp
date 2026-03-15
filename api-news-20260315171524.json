@@ -1,0 +1,1 @@
+{"apiFields":[{"fieldId":"title","name":"タイトル","kind":"text","required":true,"isUnique":false},{"fieldId":"content","name":"内容","kind":"richEditorV2","required":true},{"fieldId":"category","name":"カテゴリ","kind":"relation","required":true},{"fieldId":"time","name":"日時","kind":"date","required":true}],"customFields":[]}
