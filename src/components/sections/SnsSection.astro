@@ -10,7 +10,7 @@ interface Props {
   snsImages: SnsImage[];
 }
 
-const { snsImages } = Astro.props;
+const { snsImages } = Astro.props as Props;
 ---
 
 <section id="sns" class="section-frame">

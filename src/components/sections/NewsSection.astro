@@ -21,7 +21,7 @@ interface Props {
   newsImages: NewsImage[];
 }
 
-const { newsItems, newsMessage, newsImages } = Astro.props;
+const { newsItems, newsMessage, newsImages } = Astro.props as Props;
 ---
 
 <section id="news" class="section-frame section-news">

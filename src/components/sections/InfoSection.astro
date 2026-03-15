@@ -10,7 +10,7 @@ interface Props {
   infoImages: InfoImage[];
 }
 
-const { infoImages } = Astro.props;
+const { infoImages } = Astro.props as Props;
 ---
 
 <section id="info" class="section-frame">

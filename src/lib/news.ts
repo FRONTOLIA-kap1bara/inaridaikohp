@@ -1,3 +1,5 @@
+/// <reference types="astro/client" />
+
 type NewsCategory = {
   id?: string;
   name?: string;

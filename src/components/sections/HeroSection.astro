@@ -10,7 +10,7 @@ interface Props {
   heroImages: HeroImage[];
 }
 
-const { heroImages } = Astro.props;
+const { heroImages } = Astro.props as Props;
 ---
 
 <section class="relative min-h-screen overflow-hidden" id="home">
