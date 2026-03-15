@@ -30,35 +30,48 @@ const allImages: ImageEntry[] = Object.entries(imageModules)
   }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-const heroNames = ["hero.PNG", "hero1.PNG", "hero2.PNG", "hero3.PNG"];
-const heroImages = heroNames
-  .map((name) =>
-    allImages.find((item) => item.name.toLowerCase() === name.toLowerCase())
-  )
-  .filter((item): item is ImageEntry => Boolean(item));
+const getBaseName = (name: string) => name.replace(/\.[^.]+$/, "").toLowerCase();
 
-if (heroImages.length < 4) {
-  const fallbackImages = allImages.filter(
-    (item) =>
-      item.name.toLowerCase() !== "logo.jpg" &&
-      !heroImages.some((hero) => hero.name === item.name)
-  );
-  heroImages.push(...fallbackImages.slice(0, 4 - heroImages.length));
-}
+const findImageByBase = (baseName: string) =>
+  allImages.find((item) => getBaseName(item.name) === baseName.toLowerCase());
+
+const pickImagesByBases = (baseNames: string[]) =>
+  baseNames
+    .map((baseName) => findImageByBase(baseName))
+    .filter((item): item is ImageEntry => Boolean(item));
+
+const heroImages = pickImagesByBases(["hero", "hero1", "hero2", "hero3"]);
+const infoImages = pickImagesByBases(["info", "info2"]);
+const newsImages = pickImagesByBases(["news", "news2"]);
+const snsImages = pickImagesByBases(["sns", "sns2"]);
 
 const usedImageNames = new Set(
-  [...heroImages, ...allImages.filter((img) => img.name.toLowerCase() === "logo.jpg")].map(
-    (item) => item.name.toLowerCase()
-  )
+  [
+    ...heroImages,
+    ...infoImages,
+    ...newsImages,
+    ...snsImages,
+    ...allImages.filter((img) => img.name.toLowerCase() === "logo.jpg")
+  ].map((item) => item.name.toLowerCase())
 );
 
-const galleryPool = allImages.filter(
+const fallbackImages = allImages.filter(
   (item) => !usedImageNames.has(item.name.toLowerCase())
 );
 
-const infoImages = galleryPool.slice(0, 2);
-const newsImages = galleryPool.slice(2, 4);
-const snsImages = galleryPool.slice(4, 6);
+const fillMissingImages = (target: ImageEntry[], expected: number) => {
+  if (target.length >= expected) return target;
+  const available = fallbackImages.filter(
+    (item) => !target.some((picked) => picked.name.toLowerCase() === item.name.toLowerCase())
+  );
+  target.push(...available.slice(0, expected - target.length));
+  return target;
+};
+
+fillMissingImages(heroImages, 4);
+fillMissingImages(infoImages, 2);
+fillMissingImages(newsImages, 2);
+fillMissingImages(snsImages, 2);
 
 const formatDate = (value: string) => {
   if (!value) return "";
