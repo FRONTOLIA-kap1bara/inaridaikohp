@@ -37,6 +37,29 @@ body {
   animation: opening-curtain-fallback 1.2s ease-out 1.1s forwards;
 }
 
+html.js-gsap [data-animate],
+html.js-gsap [data-stagger] > :not([data-animate]) {
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform, opacity, filter;
+}
+
+html.js-gsap .parallax-image {
+  transition: none !important;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js-gsap [data-animate],
+  html.js-gsap [data-stagger] > :not([data-animate]) {
+    opacity: 1;
+    visibility: visible;
+    will-change: auto;
+  }
+}
+
 .font-title {
   font-family: "Shippori Mincho", "Noto Serif JP", serif;
 }
