@@ -1,6 +1,6 @@
 ﻿---
 import "../../styles/global.css";
-import { fetchNewsById, formatDate, getCategoryLabel } from "../../lib/news";
+import { fetchNewsById, formatDate, getCategoryLabel, toSummary } from "../../lib/news";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/sections/Header.astro";
 
@@ -16,11 +16,73 @@ const title = item?.title ?? "ニュース詳細";
 const htmlContent = item?.content ?? "";
 const categoryLabel = getCategoryLabel(item?.category);
 const dateLabel = formatDate(item?.time ?? "");
+const articlePath = `/news/${id}`;
+const articleUrl = new URL(articlePath, Astro.url.origin).toString();
+const articleSummary = toSummary(htmlContent, 140);
+const structuredData = item
+  ? [
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "ホーム",
+            item: new URL("/", Astro.url.origin).toString()
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "ニュース一覧",
+            item: new URL("/news", Astro.url.origin).toString()
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: title,
+            item: articleUrl
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        headline: title,
+        description: articleSummary,
+        inLanguage: "ja-JP",
+        datePublished: item.time,
+        dateModified: item.time,
+        articleSection: categoryLabel,
+        url: articleUrl,
+        mainEntityOfPage: articleUrl,
+        author: {
+          "@type": "Organization",
+          name: "威鳴太鼓"
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "威鳴太鼓",
+          logo: {
+            "@type": "ImageObject",
+            url: new URL("/images/logo.jpg", Astro.url.origin).toString()
+          }
+        },
+        image: [new URL("/images/hero.PNG", Astro.url.origin).toString()]
+      }
+    ]
+  : undefined;
 ---
 
 <BaseLayout
   title={`${title} | 威鳴太鼓│豊川高校和太鼓部`}
-  description="豊川和太鼓 いなり太鼓のニュース詳細ページです。"
+  description={item ? articleSummary : "指定されたニュースは見つかりませんでした。"}
+  canonicalPath={articlePath}
+  ogType="article"
+  publishedTime={item?.time}
+  modifiedTime={item?.time}
+  noindex={!item}
+  structuredData={structuredData}
 >
   <Header />
   <main class="news-page-main">

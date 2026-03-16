@@ -85,11 +85,37 @@ const topNewsItems = newsResult.items.slice(0, 5).map((item) => ({
 
 const hasMoreNews = newsResult.items.length > 5;
 const newsMessage = newsResult.message ?? "現在、ニュースは準備中です。";
+
+const homeUrl = new URL("/", Astro.url.origin).toString();
+const logoUrl = new URL("/images/logo.jpg", Astro.url.origin).toString();
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "威鳴太鼓│豊川高校和太鼓部",
+    url: homeUrl,
+    inLanguage: "ja-JP"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "威鳴太鼓",
+    alternateName: "豊川高校和太鼓部",
+    url: homeUrl,
+    logo: logoUrl,
+    sameAs: [
+      "https://www.instagram.com/toyokawa_wadaiko",
+      "https://toyokawa.ed.jp/club/japanesedrum"
+    ]
+  }
+];
 ---
 
 <BaseLayout
   title="威鳴太鼓│豊川高校和太鼓部"
   description="愛知県豊川市を拠点に活動する和太鼓チーム『いなり太鼓』の公式サイトです。最新ニュースや活動情報をご覧いただけます。"
+  canonicalPath="/"
+  structuredData={structuredData}
 >
   <Header />
   <main>

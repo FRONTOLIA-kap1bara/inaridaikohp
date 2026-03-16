@@ -13,11 +13,48 @@ const newsItems = newsResult.items.map((item) => ({
   date: formatDate(item.time),
   datetime: item.time
 }));
+
+const listUrl = new URL("/news", Astro.url.origin).toString();
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ホーム",
+        item: new URL("/", Astro.url.origin).toString()
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "ニュース一覧",
+        item: listUrl
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "威鳴太鼓ニュース一覧",
+    itemListOrder: "https://schema.org/ItemListOrderDescending",
+    numberOfItems: newsItems.length,
+    itemListElement: newsItems.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: new URL(`/news/${item.id}`, Astro.url.origin).toString(),
+      name: item.title
+    }))
+  }
+];
 ---
 
 <BaseLayout
   title="ニュース一覧 | 威鳴太鼓│豊川高校和太鼓部"
   description="豊川和太鼓 いなり太鼓のニュース一覧です。"
+  canonicalPath="/news"
+  structuredData={structuredData}
 >
   <Header />
   <main class="news-page-main">
