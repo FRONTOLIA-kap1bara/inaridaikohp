@@ -9,3 +9,8 @@ script = ""
 name = "実行する"
 icon = "run"
 command = "git add ."
+
+[[actions]]
+name = "開発者サーバー起動コマンド"
+icon = "tool"
+command = "npm run dev"

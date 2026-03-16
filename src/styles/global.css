@@ -138,14 +138,7 @@ html.js-gsap .parallax-image {
 
 .section-info::before {
   background:
-    radial-gradient(circle at 8% 14%, rgba(143, 27, 43, 0.09), transparent 36%),
-    repeating-linear-gradient(
-      -35deg,
-      rgba(143, 27, 43, 0.05) 0,
-      rgba(143, 27, 43, 0.05) 1px,
-      transparent 1px,
-      transparent 18px
-    );
+    radial-gradient(circle at 10% 14%, rgba(143, 27, 43, 0.07), transparent 38%);
 }
 
 .section-news {
@@ -474,14 +467,37 @@ html.js-gsap .parallax-image {
   display: grid;
   gap: 1.15rem;
   grid-template-columns: 1.2fr 1fr;
+  align-items: stretch;
 }
 
 .info-story {
   padding: clamp(1.3rem, 2.3vw, 2rem);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid rgba(143, 27, 43, 0.28);
+  border-left: 4px solid rgba(143, 27, 43, 0.62);
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.54)),
+    linear-gradient(180deg, rgba(143, 27, 43, 0.06), transparent 65%);
+  box-shadow: 0 14px 28px rgba(20, 15, 12, 0.1);
 }
 
 .activity-panel {
   padding: clamp(1.3rem, 2.3vw, 1.9rem);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-color: rgba(30, 30, 30, 0.16);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.56)),
+    linear-gradient(160deg, rgba(214, 176, 102, 0.08), transparent 62%);
+  box-shadow: 0 10px 20px rgba(20, 15, 12, 0.07);
+}
+
+.section-info .activity-panel h3 {
+  color: rgba(16, 16, 16, 0.9);
 }
 
 .achievement-list {
@@ -493,13 +509,24 @@ html.js-gsap .parallax-image {
 }
 
 .achievement-list li {
-  padding: 0.54rem 0.75rem;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.88);
+  padding: 0.5rem 0.72rem;
+  border-radius: 0.42rem;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(30, 30, 30, 0.08);
+  border-left: 3px solid rgba(143, 27, 43, 0.24);
+  color: rgba(16, 16, 16, 0.82);
   font-size: 0.94rem;
-  line-height: 1.65;
+  line-height: 1.6;
+}
+
+.section-info .section-decor {
+  opacity: 0.5;
+}
+
+.section-info .decor-grid,
+.section-info .decor-ring,
+.section-info .decor-pill {
+  opacity: 0.45;
 }
 
 .info-gallery {
@@ -870,8 +897,41 @@ html.js-gsap .parallax-image {
 }
 
 @media (max-width: 768px) {
+  .site-header-inner {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0.7rem;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+  }
+
+  .site-brand {
+    width: fit-content;
+    min-width: 0;
+    align-self: center;
+    letter-spacing: 0.08em;
+  }
+
+  .site-brand-text {
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow-wrap: normal;
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+  }
+
+  .site-nav {
+    width: 100%;
+  }
+
+  .site-nav-list {
+    justify-content: center;
+    gap: 0.45rem;
+  }
+
   .nav-link {
-    padding: 0.35rem 0.62rem;
+    padding: 0.32rem 0.58rem;
     letter-spacing: 0.08em;
   }
 
@@ -910,5 +970,24 @@ html.js-gsap .parallax-image {
 
   .news-side iframe {
     height: 420px;
+  }
+
+  .news-page-main {
+    padding-top: 8.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-brand {
+    letter-spacing: 0.04em;
+  }
+
+  .site-nav-list {
+    font-size: 0.68rem;
+  }
+
+  .nav-link {
+    padding: 0.3rem 0.5rem;
+    letter-spacing: 0.05em;
   }
 }
