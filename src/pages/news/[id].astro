@@ -90,10 +90,14 @@ const structuredData = item
       <div class="news-page-head">
         <p class="section-label">NEWS DETAIL</p>
         <h1 class="section-title">{title}</h1>
-        <div class="news-meta">
-          <span class="category-pill">{categoryLabel}</span>
-          <time datetime={item?.time}>{dateLabel}</time>
-        </div>
+        {
+          item && (
+            <div class="news-meta">
+              <span class="category-pill">{categoryLabel}</span>
+              <time datetime={item.time}>{dateLabel}</time>
+            </div>
+          )
+        }
       </div>
 
       {
