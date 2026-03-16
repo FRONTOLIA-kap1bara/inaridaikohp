@@ -34,7 +34,7 @@ body {
 
 #opening-curtain {
   pointer-events: none;
-  animation: opening-curtain-fallback 1.2s ease-out 1.1s forwards;
+  animation: opening-curtain-fallback 0.45s ease-out 0.15s forwards;
 }
 
 html.js-gsap [data-animate],

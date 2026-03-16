@@ -46,6 +46,8 @@
 
     gsap.set(element, fromConfig);
 
+    const revealDuration = mode === "text-reveal" ? 0.72 : 1.05;
+
     gsap.to(
       element,
       {
@@ -57,7 +59,7 @@
         letterSpacing: "normal",
         filter: "blur(0px)",
         clipPath: "inset(0 0 0% 0)",
-        duration: 1.05,
+        duration: revealDuration,
         ease: "power3.out",
         overwrite: "auto",
         clearProps: "willChange",
@@ -153,26 +155,26 @@
       return;
     }
     root.style.opacity = "1";
+    initAnimations();
 
     gsap
       .timeline()
       .to(curtain, {
         opacity: 0,
-        duration: 1.1,
+        duration: 0.45,
         ease: "power2.out"
       })
       .to(
         root,
         {
           opacity: 1,
-          duration: 0.8,
+          duration: 0.35,
           ease: "power2.out",
           onComplete: () => {
             curtain.remove();
-            initAnimations();
           }
         },
-        "-=0.45"
+        "-=0.2"
       );
   };
 
@@ -186,5 +188,5 @@
       revealFallback();
       initAnimations();
     }
-  }, 2400);
+  }, 1200);
 </script>
