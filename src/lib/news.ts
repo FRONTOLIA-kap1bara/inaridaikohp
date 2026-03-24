@@ -32,12 +32,32 @@ export type NewsFetchResult = {
 };
 
 const DEFAULT_PAGE_LIMIT = 100;
+const MAX_PAGE_FETCHES = 200;
+const UNCLASSIFIED_LABEL = "未分類";
+const FALLBACK_MESSAGES = {
+  missingConfig: "microCMSの設定情報が不足しています。",
+  fetchFailed: "ニュースの取得に失敗しました。",
+  fetchError: "ニュース取得中にエラーが発生しました。"
+} as const;
+
 type MicroCMSEnvKey = "MICROCMS_SERVICE_DOMAIN" | "MICROCMS_API_KEY";
 
 const readEnvString = (env: unknown, key: MicroCMSEnvKey) => {
   if (!env || typeof env !== "object") return undefined;
   const value = (env as Record<string, unknown>)[key];
   return typeof value === "string" && value.trim() ? value : undefined;
+};
+
+const normalizeLimit = (limit?: number) => {
+  const numericLimit = typeof limit === "number" ? limit : Number.NaN;
+  return Number.isFinite(numericLimit) && numericLimit > 0
+    ? Math.floor(numericLimit)
+    : Number.POSITIVE_INFINITY;
+};
+
+const toTimestamp = (value: string) => {
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
 };
 
 const resolveMicroCMSEnv = (runtimeEnv?: unknown) => {
@@ -56,20 +76,19 @@ const resolveMicroCMSEnv = (runtimeEnv?: unknown) => {
 
 const sortByNewest = (items: NewsItem[]) =>
   [...items].sort((a, b) => {
-    const aTime = new Date(a.time).getTime();
-    const bTime = new Date(b.time).getTime();
-    if (Number.isNaN(aTime) || Number.isNaN(bTime)) return 0;
+    const aTime = toTimestamp(a.time);
+    const bTime = toTimestamp(b.time);
     return bTime - aTime;
   });
 
 export const getCategoryLabel = (category: unknown) => {
-  if (!category) return "未分類";
+  if (!category) return UNCLASSIFIED_LABEL;
   if (typeof category === "string") return category;
   if (typeof category === "object" && "name" in category) {
     const categoryName = category.name;
-    return typeof categoryName === "string" && categoryName ? categoryName : "未分類";
+    return typeof categoryName === "string" && categoryName ? categoryName : UNCLASSIFIED_LABEL;
   }
-  return "未分類";
+  return UNCLASSIFIED_LABEL;
 };
 
 export const stripHtml = (value: string) =>
@@ -144,19 +163,24 @@ export async function fetchNews(limit?: number, runtimeEnv?: unknown): Promise<N
     return {
       items: [],
       source: "fallback",
-      message: "microCMSの設定情報が不足しています。"
+      message: FALLBACK_MESSAGES.missingConfig
     };
   }
 
-  const targetCount =
-    Number.isFinite(limit) && (limit as number) > 0 ? Math.floor(limit as number) : Number.POSITIVE_INFINITY;
+  const targetCount = normalizeLimit(limit);
 
   let offset = 0;
   let totalCount = Number.POSITIVE_INFINITY;
+  let pageFetchCount = 0;
   const collected: NewsItem[] = [];
 
   try {
     while (offset < totalCount && collected.length < targetCount) {
+      if (pageFetchCount >= MAX_PAGE_FETCHES) {
+        break;
+      }
+      pageFetchCount += 1;
+
       const remaining = targetCount - collected.length;
       const pageLimit = Number.isFinite(remaining)
         ? Math.max(1, Math.min(DEFAULT_PAGE_LIMIT, remaining))
@@ -173,7 +197,7 @@ export async function fetchNews(limit?: number, runtimeEnv?: unknown): Promise<N
         return {
           items: [],
           source: "fallback",
-          message: "ニュースの取得に失敗しました。"
+          message: FALLBACK_MESSAGES.fetchFailed
         };
       }
 
@@ -189,7 +213,11 @@ export async function fetchNews(limit?: number, runtimeEnv?: unknown): Promise<N
       }
 
       collected.push(...pageItems);
-      offset += pageItems.length;
+      const nextOffset = offset + pageItems.length;
+      if (nextOffset <= offset) {
+        break;
+      }
+      offset = nextOffset;
 
       if (pageItems.length < pageLimit) {
         break;
@@ -204,7 +232,7 @@ export async function fetchNews(limit?: number, runtimeEnv?: unknown): Promise<N
     return {
       items: [],
       source: "fallback",
-      message: "ニュース取得中にエラーが発生しました。"
+      message: FALLBACK_MESSAGES.fetchError
     };
   }
 }

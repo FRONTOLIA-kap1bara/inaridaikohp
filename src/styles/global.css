@@ -252,14 +252,6 @@ html.js-gsap .parallax-image {
   backdrop-filter: blur(8px);
 }
 
-.panel-dark {
-  border-color: rgba(255, 255, 255, 0.15);
-  background:
-    linear-gradient(160deg, rgba(20, 22, 30, 0.96), rgba(14, 15, 21, 0.94)),
-    radial-gradient(circle at 85% 15%, rgba(143, 27, 43, 0.34), transparent 45%);
-  box-shadow: 0 24px 44px rgba(0, 0, 0, 0.3);
-}
-
 .section-decor {
   position: absolute;
   inset: 0;
@@ -844,10 +836,6 @@ html.js-gsap .parallax-image {
 
 .contact-panel-main {
   border-left: 3px solid rgba(214, 176, 102, 0.72);
-}
-
-.contact-panel-sub {
-  border-left: 3px solid rgba(143, 27, 43, 0.82);
 }
 
 .mail-link {
