@@ -15,6 +15,10 @@ const newsItems = newsResult.items.map((item) => ({
 }));
 
 const listUrl = new URL("/news", Astro.url.origin).toString();
+const homeUrl = new URL("/", Astro.url.origin).toString();
+const listDescription =
+  "豊川和太鼓 威鳴太鼓（いなり太鼓）のニュース一覧ページです。大会結果・公演情報・活動レポートを最新順で掲載しています。";
+const latestDateTime = newsItems[0]?.datetime;
 const structuredData = [
   {
     "@context": "https://schema.org",
@@ -36,6 +40,20 @@ const structuredData = [
   },
   {
     "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "ニュース一覧 | 威鳴太鼓│豊川高校和太鼓部",
+    description: listDescription,
+    url: listUrl,
+    inLanguage: "ja-JP",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "威鳴太鼓│豊川高校和太鼓部",
+      url: homeUrl
+    },
+    ...(latestDateTime ? { dateModified: latestDateTime } : {})
+  },
+  {
+    "@context": "https://schema.org",
     "@type": "ItemList",
     name: "威鳴太鼓ニュース一覧",
     itemListOrder: "https://schema.org/ItemListOrderDescending",
@@ -52,8 +70,10 @@ const structuredData = [
 
 <BaseLayout
   title="ニュース一覧 | 威鳴太鼓│豊川高校和太鼓部"
-  description="豊川和太鼓 いなり太鼓のニュース一覧です。"
+  description={listDescription}
+  keywords="豊川和太鼓,いなり太鼓,威鳴太鼓,ニュース一覧,和太鼓活動情報,公演情報,部活動ニュース"
   canonicalPath="/news"
+  modifiedTime={latestDateTime}
   structuredData={structuredData}
 >
   <Header />

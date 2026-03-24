@@ -16,6 +16,12 @@ type SitemapEntry = {
   priority?: number;
 };
 
+const toValidLastmod = (value: string | undefined) => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+};
+
 const buildUrlNode = (entry: SitemapEntry) => {
   const lines = [`<url>`, `<loc>${escapeXml(entry.loc)}</loc>`];
   if (entry.lastmod) lines.push(`<lastmod>${escapeXml(entry.lastmod)}</lastmod>`);
@@ -33,26 +39,34 @@ export const GET: APIRoute = async ({ url, locals }) => {
       : undefined;
 
   const nowIso = new Date().toISOString();
+  const news = await fetchNews(undefined, runtimeEnv);
+  const latestNewsIso = toValidLastmod(news.items[0]?.time) ?? nowIso;
   const entries: SitemapEntry[] = [
     {
       loc: `${origin}/`,
-      lastmod: nowIso,
+      lastmod: latestNewsIso,
       changefreq: "weekly",
       priority: 1.0
     },
     {
       loc: `${origin}/news`,
-      lastmod: nowIso,
+      lastmod: latestNewsIso,
       changefreq: "daily",
       priority: 0.9
+    },
+    {
+      loc: `${origin}/rss.xml`,
+      lastmod: latestNewsIso,
+      changefreq: "daily",
+      priority: 0.4
     }
   ];
 
-  const news = await fetchNews(undefined, runtimeEnv);
   for (const item of news.items) {
+    const itemLastmod = toValidLastmod(item.time) ?? latestNewsIso;
     entries.push({
       loc: `${origin}/news/${encodeURIComponent(item.id)}`,
-      lastmod: item.time || nowIso,
+      lastmod: itemLastmod,
       changefreq: "monthly",
       priority: 0.7
     });

@@ -1,6 +1,6 @@
 ﻿---
 import "../../styles/global.css";
-import { fetchNewsById, formatDate, getCategoryLabel, toSummary } from "../../lib/news";
+import { fetchNewsById, formatDate, getCategoryLabel, stripHtml, toSummary } from "../../lib/news";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/sections/Header.astro";
 
@@ -14,11 +14,14 @@ if (!item) {
 }
 const title = item?.title ?? "ニュース詳細";
 const htmlContent = item?.content ?? "";
+const plainContent = stripHtml(htmlContent);
 const categoryLabel = getCategoryLabel(item?.category);
 const dateLabel = formatDate(item?.time ?? "");
-const articlePath = `/news/${id}`;
+const articlePath = `/news/${encodeURIComponent(id)}`;
 const articleUrl = new URL(articlePath, Astro.url.origin).toString();
-const articleSummary = toSummary(htmlContent, 140);
+const fallbackDescription = "威鳴太鼓（豊川高校和太鼓部）のニュース詳細ページです。";
+const articleSummary = toSummary(htmlContent, 140) || fallbackDescription;
+const keywords = [categoryLabel, "威鳴太鼓", "いなり太鼓", "豊川和太鼓", "豊川高校和太鼓部"].join(",");
 const structuredData = item
   ? [
       {
@@ -55,7 +58,13 @@ const structuredData = item
         dateModified: item.time,
         articleSection: categoryLabel,
         url: articleUrl,
-        mainEntityOfPage: articleUrl,
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": articleUrl
+        },
+        articleBody: plainContent,
+        wordCount: plainContent.length,
+        isAccessibleForFree: true,
         author: {
           "@type": "Organization",
           name: "威鳴太鼓"
@@ -77,6 +86,7 @@ const structuredData = item
 <BaseLayout
   title={`${title} | 威鳴太鼓│豊川高校和太鼓部`}
   description={item ? articleSummary : "指定されたニュースは見つかりませんでした。"}
+  keywords={keywords}
   canonicalPath={articlePath}
   ogType="article"
   publishedTime={item?.time}
