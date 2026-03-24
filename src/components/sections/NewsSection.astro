@@ -19,10 +19,9 @@ interface Props {
   newsItems: ViewNewsItem[];
   newsMessage: string;
   newsImages: NewsImage[];
-  hasMoreNews: boolean;
 }
 
-const { newsItems, newsMessage, newsImages, hasMoreNews } = Astro.props as Props;
+const { newsItems, newsMessage, newsImages } = Astro.props as Props;
 ---
 
 <section id="news" class="section-frame section-news">
@@ -65,13 +64,9 @@ const { newsItems, newsMessage, newsImages, hasMoreNews } = Astro.props as Props
           )
         }
 
-        {
-          hasMoreNews ? (
-            <div class="mt-2" data-animate="fade-up">
-              <a class="primary-button" href="/news">全てのニュースを見る</a>
-            </div>
-          ) : null
-        }
+        <div class="news-all-link-wrap" data-animate="fade-up">
+          <a class="primary-button" href="/news">すべてのニュース</a>
+        </div>
       </div>
 
       <aside class="news-side" data-animate="slide-left">

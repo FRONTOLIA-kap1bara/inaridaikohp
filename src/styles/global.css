@@ -594,6 +594,12 @@ html.js-gsap .parallax-image {
   min-width: 0;
 }
 
+.news-all-link-wrap {
+  margin-top: 0.35rem;
+  display: flex;
+  justify-content: center;
+}
+
 .news-card,
 .news-empty,
 .sns-card,
@@ -1009,6 +1015,10 @@ html.js-gsap .parallax-image {
 
   .news-side iframe {
     height: 420px;
+  }
+
+  .news-all-link-wrap .primary-button {
+    width: auto;
   }
 
   .news-page-main {

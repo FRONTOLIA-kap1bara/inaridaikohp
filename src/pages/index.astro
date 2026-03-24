@@ -77,13 +77,12 @@ const newsResult = await fetchNews();
 const topNewsItems = newsResult.items.slice(0, 5).map((item) => ({
   id: item.id,
   title: item.title,
-  summary: toSummary(item.content, 20),
+  summary: toSummary(item.content),
   category: getCategoryLabel(item.category),
   date: formatDate(item.time),
   datetime: item.time
 }));
 
-const hasMoreNews = newsResult.items.length > 5;
 const newsMessage = newsResult.message ?? "現在、ニュースは準備中です。";
 
 const homeUrl = new URL("/", Astro.url.origin).toString();
@@ -125,7 +124,6 @@ const structuredData = [
       newsItems={topNewsItems}
       newsMessage={newsMessage}
       newsImages={newsImages}
-      hasMoreNews={hasMoreNews}
     />
     <SnsSection snsImages={snsImages} />
     <ContactSection />

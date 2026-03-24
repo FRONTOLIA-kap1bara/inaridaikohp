@@ -26,6 +26,7 @@
   };
 
   const animateByMode = (element, mode) => {
+    const usesClipPath = mode === "clip-up";
     const base = { autoAlpha: 0, force3D: true };
     const fromConfig =
       mode === "slide-left"
@@ -58,11 +59,11 @@
         rotation: 0,
         letterSpacing: "normal",
         filter: "blur(0px)",
-        clipPath: "inset(0 0 0% 0)",
+        ...(usesClipPath ? { clipPath: "inset(0 0 0% 0)" } : {}),
         duration: revealDuration,
         ease: "power3.out",
         overwrite: "auto",
-        clearProps: "willChange",
+        clearProps: usesClipPath ? "clipPath,willChange" : "willChange",
         scrollTrigger: {
           trigger: element,
           start: "top 88%",
