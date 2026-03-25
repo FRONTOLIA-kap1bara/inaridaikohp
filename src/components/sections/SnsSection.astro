@@ -30,7 +30,7 @@ const { snsImages } = Astro.props as Props;
       </p>
     </div>
 
-    <div class="sns-links" data-stagger="links">
+    <div class="sns-links" data-stagger="links" data-animate="fade-up">
       <a
         href="https://www.instagram.com/toyokawa_wadaiko"
         target="_blank"
@@ -57,7 +57,11 @@ const { snsImages } = Astro.props as Props;
       </a>
     </div>
 
-    <div class={`sns-gallery sns-gallery-${snsImages.length >= 3 ? 3 : snsImages.length || 1}`} data-stagger="gallery">
+    <div
+      class={`sns-gallery sns-gallery-${snsImages.length >= 3 ? 3 : snsImages.length || 1}`}
+      data-stagger="gallery"
+      data-animate="fade-up"
+    >
       {
         snsImages.map((entry, index) => (
           <figure

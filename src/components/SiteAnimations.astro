@@ -34,7 +34,7 @@
         : mode === "slide-right"
           ? { ...base, x: -40 }
           : mode === "fade-quick"
-            ? { ...base, y: 8 }
+            ? { ...base, y: 26 }
           : mode === "zoom-in"
             ? { ...base, scale: 0.94 }
             : mode === "rise-blur"
@@ -50,8 +50,8 @@
     gsap.set(element, fromConfig);
 
     const revealDuration =
-      mode === "fade-quick" ? 0.78 : mode === "text-reveal" ? 0.72 : 0.95;
-    const triggerStart = mode === "fade-quick" ? "top 90%" : "top 86%";
+      mode === "fade-quick" ? 1.35 : mode === "text-reveal" ? 0.78 : 1.2;
+    const triggerStart = mode === "fade-quick" ? "top 78%" : "top 82%";
 
     gsap.to(
       element,
@@ -93,14 +93,14 @@
         autoAlpha: 1,
         y: 0,
         scale: 1,
-        duration: 0.88,
+        duration: 1.15,
         ease: "power3.out",
-        stagger: 0.12,
+        stagger: 0.18,
         overwrite: "auto",
         clearProps: "willChange",
         scrollTrigger: {
           trigger: group,
-          start: "top 86%",
+          start: "top 82%",
           once: true,
           invalidateOnRefresh: true
         }
@@ -193,14 +193,14 @@
     window.addEventListener(
       "load",
       () => {
-        ScrollTrigger.refresh();
+        initAnimations();
       },
       { once: true }
     );
 
     window.setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 260);
+      initAnimations();
+    }, 320);
   });
 
   window.setTimeout(() => {
