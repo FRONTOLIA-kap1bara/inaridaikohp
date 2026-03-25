@@ -60,7 +60,10 @@ const { snsImages } = Astro.props as Props;
     <div class={`sns-gallery sns-gallery-${snsImages.length >= 3 ? 3 : snsImages.length || 1}`} data-stagger="gallery">
       {
         snsImages.map((entry, index) => (
-          <figure class={`photo-frame sns-photo framed-photo ${index === 1 ? "sns-photo-tall" : ""} ${index === 0 ? "sns-photo-main" : ""}`} data-animate="zoom-in">
+          <figure
+            class={`photo-frame sns-photo framed-photo ${index === 1 ? "sns-photo-tall" : ""} ${index === 0 ? "sns-photo-main" : ""}`}
+            data-animate="zoom-in"
+          >
             <img
               src={entry.image.src}
               alt="威鳴太鼓のSNS掲載写真"

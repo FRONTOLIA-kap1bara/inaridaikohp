@@ -1,0 +1,51 @@
+---
+import type { GalleryItem } from "../../lib/gallery";
+
+interface Props {
+  galleryItems: GalleryItem[];
+  galleryMessage: string;
+}
+
+const { galleryItems, galleryMessage } = Astro.props as Props;
+---
+
+<section id="gallery" class="section-frame section-gallery">
+  <div class="section-inner">
+    <div class="section-decor">
+      <span class="decor-orb decor-orb-d" data-float="slow"></span>
+      <span class="decor-ring decor-ring-c" data-float="fast"></span>
+      <span class="decor-pill decor-pill-c" data-float="slow"></span>
+      <span class="decor-grid"></span>
+    </div>
+
+    <div class="section-head" data-animate="clip-up">
+      <p class="section-label">GALLERY</p>
+      <h2 class="section-title">ギャラリー</h2>
+      <p class="section-intro">
+        演奏や活動の写真を掲載しています。定期的に更新しているのでぜひご覧ください。
+      </p>
+    </div>
+
+    {
+      galleryItems.length > 0 ? (
+        <div class="gallery-grid" data-stagger="gallery">
+          {galleryItems.map((item) => (
+            <figure class="gallery-photo" data-animate="zoom-in">
+              <img
+                src={item.imageUrl}
+                alt={item.imageAlt}
+                loading="lazy"
+                decoding="async"
+                class="gallery-image"
+              />
+            </figure>
+          ))}
+        </div>
+      ) : (
+        <div class="gallery-empty panel-lacquer" data-animate="fade-up">
+          <p>{galleryMessage}</p>
+        </div>
+      )
+    }
+  </div>
+</section>

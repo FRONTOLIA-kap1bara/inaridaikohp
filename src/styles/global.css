@@ -91,7 +91,7 @@ html.js-gsap .parallax-image {
   position: absolute;
   inset: 0;
   opacity: 0;
-  animation: hero-fade 24s linear infinite;
+  animation: hero-fade 30s linear infinite;
   animation-delay: calc(var(--slide-index) * 6s);
 }
 
@@ -160,6 +160,13 @@ html.js-gsap .parallax-image {
   background:
     radial-gradient(circle at 10% 16%, rgba(143, 27, 43, 0.12), transparent 33%),
     linear-gradient(162deg, #f5f1e9 0%, #ece5d8 100%);
+}
+
+.section-gallery {
+  background:
+    radial-gradient(circle at 88% 16%, rgba(214, 176, 102, 0.24), transparent 34%),
+    radial-gradient(circle at 12% 84%, rgba(143, 27, 43, 0.12), transparent 30%),
+    linear-gradient(160deg, #f9f3e8 0%, #efe4d4 100%);
 }
 
 .section-contact {
@@ -686,7 +693,7 @@ html.js-gsap .parallax-image {
 }
 
 .news-photo-ribbon-2 {
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
 }
 
 .news-photo {
@@ -695,6 +702,26 @@ html.js-gsap .parallax-image {
 
 .news-photo-wide {
   min-height: 230px;
+}
+
+.news-photo-ribbon-2 .news-photo:not(.news-photo-wide) {
+  max-width: min(360px, 100%);
+  min-height: clamp(220px, 26vw, 320px);
+  justify-self: center;
+}
+
+.news-photo-ribbon-2 .news-photo:not(.news-photo-wide)::after,
+.news-photo-ribbon-2 .news-photo:not(.news-photo-wide) img {
+  border-radius: 0.7rem;
+}
+
+.news-photo-contain {
+  background: rgba(9, 10, 14, 0.55);
+}
+
+.news-photo-contain img {
+  object-fit: contain !important;
+  background: rgba(9, 10, 14, 0.55);
 }
 
 .news-page-main {
@@ -805,7 +832,57 @@ html.js-gsap .parallax-image {
 }
 
 .sns-gallery-3 {
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  grid-template-rows: repeat(2, minmax(220px, auto));
+}
+
+.sns-gallery-3 .sns-photo-main {
+  grid-column: 1;
+  grid-row: span 2;
+  min-height: clamp(320px, 34vw, 430px);
+}
+
+.sns-gallery-3 .sns-photo-tall {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: clamp(220px, 22vw, 280px);
+}
+
+.sns-gallery-3 .sns-photo:nth-child(3) {
+  grid-column: 2;
+  grid-row: 2;
+  min-height: clamp(220px, 22vw, 280px);
+}
+
+.gallery-grid {
+  margin-top: clamp(1.8rem, 3vw, 2.4rem);
+  display: grid;
+  gap: 0.95rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gallery-photo {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.gallery-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0;
+  transform: none !important;
+  filter: none !important;
+}
+
+.gallery-empty {
+  margin-top: clamp(1.8rem, 3vw, 2.4rem);
+  padding: 1rem 1.2rem;
 }
 
 .contact-layout {
@@ -899,6 +976,10 @@ html.js-gsap .parallax-image {
     grid-template-columns: 1fr;
   }
 
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .contact-main-row {
     grid-template-columns: 1fr;
   }
@@ -954,7 +1035,7 @@ html.js-gsap .parallax-image {
 
   .site-nav-list {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 0.32rem;
     justify-content: stretch;
     width: 100%;
@@ -976,7 +1057,8 @@ html.js-gsap .parallax-image {
   .info-gallery,
   .sns-links,
   .sns-gallery,
-  .news-photo-ribbon {
+  .news-photo-ribbon,
+  .gallery-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1001,8 +1083,23 @@ html.js-gsap .parallax-image {
     min-height: 220px;
   }
 
+  .news-photo-ribbon-2 .news-photo:not(.news-photo-wide) {
+    max-width: 100%;
+    border-radius: 1.05rem;
+    min-height: 220px;
+  }
+
+  .news-photo-ribbon-2 .news-photo:not(.news-photo-wide)::after,
+  .news-photo-ribbon-2 .news-photo:not(.news-photo-wide) img {
+    border-radius: 0.7rem;
+  }
+
   .news-side iframe {
     height: 420px;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
   }
 
   .news-all-link-wrap .primary-button {

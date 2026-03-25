@@ -96,7 +96,10 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
     <div class={`news-photo-ribbon news-photo-ribbon-${Math.min(newsImages.length, 2) || 1}`} data-stagger="gallery">
       {
         newsImages.map((entry, index) => (
-          <figure class={`photo-frame news-photo framed-photo ${index === 0 ? "news-photo-wide" : ""}`} data-animate="clip-up">
+          <figure
+            class={`photo-frame news-photo framed-photo ${index === 0 ? "news-photo-wide" : ""} ${index === 1 ? "news-photo-contain" : ""}`}
+            data-animate="clip-up"
+          >
             <img
               src={entry.image.src}
               alt="豊川和太鼓ニュース関連写真"

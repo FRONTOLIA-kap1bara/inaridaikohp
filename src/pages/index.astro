@@ -2,12 +2,14 @@
 import "../styles/global.css";
 import type { ImageMetadata } from "astro";
 import { fetchNews, formatDate, getCategoryLabel, toSummary } from "../lib/news";
+import { fetchGallery } from "../lib/gallery";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/sections/Header.astro";
 import HeroSection from "../components/sections/HeroSection.astro";
 import InfoSection from "../components/sections/InfoSection.astro";
 import NewsSection from "../components/sections/NewsSection.astro";
 import SnsSection from "../components/sections/SnsSection.astro";
+import GallerySection from "../components/sections/GallerySection.astro";
 import ContactSection from "../components/sections/ContactSection.astro";
 import SiteAnimations from "../components/SiteAnimations.astro";
 
@@ -17,33 +19,51 @@ type ImageEntry = {
   image: ImageMetadata;
 };
 
-const imageModules = import.meta.glob<{ default: ImageMetadata }>(
+const rawImageModules = import.meta.glob<{ default: ImageMetadata }>(
   "../assets/raw/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}",
   { eager: true }
 );
+const customImageModules = import.meta.glob<{ default: ImageMetadata }>(
+  "../../images/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}",
+  { eager: true }
+);
 
-const allImages: ImageEntry[] = Object.entries(imageModules)
-  .map(([path, module]) => ({
+const mapImageModules = (modules: Record<string, { default: ImageMetadata }>): ImageEntry[] =>
+  Object.entries(modules).map(([path, module]) => ({
     path,
     name: path.split("/").pop() ?? "",
     image: module.default
-  }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+  }));
+
+const mergedImageMap = new Map<string, ImageEntry>();
+for (const entry of mapImageModules(rawImageModules)) {
+  mergedImageMap.set(entry.name.toLowerCase(), entry);
+}
+for (const entry of mapImageModules(customImageModules)) {
+  mergedImageMap.set(entry.name.toLowerCase(), entry);
+}
+
+const allImages: ImageEntry[] = [...mergedImageMap.values()].sort((a, b) => a.name.localeCompare(b.name));
 
 const getBaseName = (name: string) => name.replace(/\.[^.]+$/, "").toLowerCase();
 
-const findImageByBase = (baseName: string) =>
-  allImages.find((item) => getBaseName(item.name) === baseName.toLowerCase());
+const findImageByBase = (baseName: string) => {
+  const targetBase = baseName.toLowerCase();
+  const candidates = allImages.filter((item) => getBaseName(item.name) === targetBase);
+  if (candidates.length === 0) return undefined;
+  const customCandidate = candidates.find((item) => item.path.includes("/images/"));
+  return customCandidate ?? candidates[0];
+};
 
 const pickImagesByBases = (baseNames: string[]) =>
   baseNames
     .map((baseName) => findImageByBase(baseName))
     .filter((item): item is ImageEntry => Boolean(item));
 
-const heroImages = pickImagesByBases(["hero", "hero1", "hero2", "hero3"]);
-const infoImages = pickImagesByBases(["info", "info2"]);
+const heroImages = pickImagesByBases(["hero", "hero2", "hero3", "hero4", "hero5"]);
+const infoImages = pickImagesByBases(["info", "info2", "info3"]);
 const newsImages = pickImagesByBases(["news", "news2"]);
-const snsImages = pickImagesByBases(["sns", "sns2"]);
+const snsImages = pickImagesByBases(["sns", "sns2", "sns3"]);
 
 const usedImageNames = new Set(
   [
@@ -68,10 +88,10 @@ const fillMissingImages = (target: ImageEntry[], expected: number) => {
   return target;
 };
 
-fillMissingImages(heroImages, 4);
-fillMissingImages(infoImages, 2);
+fillMissingImages(heroImages, 5);
+fillMissingImages(infoImages, 3);
 fillMissingImages(newsImages, 2);
-fillMissingImages(snsImages, 2);
+fillMissingImages(snsImages, 3);
 
 const newsResult = await fetchNews();
 const topNewsItems = newsResult.items.slice(0, 5).map((item) => ({
@@ -84,6 +104,9 @@ const topNewsItems = newsResult.items.slice(0, 5).map((item) => ({
 }));
 
 const newsMessage = newsResult.message ?? "現在、ニュースは準備中です。";
+const galleryResult = await fetchGallery(8);
+const galleryItems = galleryResult.items;
+const galleryMessage = galleryResult.message ?? "現在、ギャラリーは準備中です。";
 
 const homeUrl = new URL("/", Astro.url.origin).toString();
 const logoUrl = new URL("/images/logo.jpg", Astro.url.origin).toString();
@@ -131,6 +154,7 @@ const structuredData = [
       newsImages={newsImages}
     />
     <SnsSection snsImages={snsImages} />
+    <GallerySection galleryItems={galleryItems} galleryMessage={galleryMessage} />
     <ContactSection />
   </main>
   <SiteAnimations />
