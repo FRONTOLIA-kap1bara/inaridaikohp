@@ -1131,7 +1131,10 @@ html.js-gsap .parallax-image {
 
   .info-gallery,
   .sns-gallery,
-  .news-photo-ribbon,
+  .news-photo-ribbon {
+    grid-template-columns: 1fr;
+  }
+
   .gallery-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1162,7 +1165,12 @@ html.js-gsap .parallax-image {
     height: auto;
   }
 
-  .hero-slide img,
+  .hero-slide img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
   .info-photo img,
   .news-photo img,
   .sns-photo img {
