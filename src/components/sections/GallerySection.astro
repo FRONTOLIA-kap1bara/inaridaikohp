@@ -28,7 +28,7 @@ const { galleryItems, galleryMessage } = Astro.props as Props;
 
     {
       galleryItems.length > 0 ? (
-        <div class="gallery-grid" data-stagger="gallery">
+        <div class="gallery-grid">
           {galleryItems.map((item) => (
             <figure class="gallery-photo" data-animate="fade-quick">
               <button

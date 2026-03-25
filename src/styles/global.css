@@ -1130,11 +1130,14 @@ html.js-gsap .parallax-image {
   }
 
   .info-gallery,
-  .sns-links,
   .sns-gallery,
   .news-photo-ribbon,
   .gallery-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sns-links {
+    grid-template-columns: 1fr;
   }
 
   .section-decor {
@@ -1155,13 +1158,24 @@ html.js-gsap .parallax-image {
   .news-photo-wide,
   .sns-photo,
   .sns-photo-tall {
-    min-height: 220px;
+    min-height: 0;
+    height: auto;
+  }
+
+  .hero-slide img,
+  .info-photo img,
+  .news-photo img,
+  .sns-photo img {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
   }
 
   .news-photo-ribbon-2 .news-photo:not(.news-photo-wide) {
     max-width: 100%;
     border-radius: 1.05rem;
-    min-height: 220px;
+    min-height: 0;
+    height: auto;
   }
 
   .news-photo-ribbon-2 .news-photo:not(.news-photo-wide)::after,
