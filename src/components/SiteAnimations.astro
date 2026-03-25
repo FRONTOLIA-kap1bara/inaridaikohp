@@ -50,8 +50,8 @@
     gsap.set(element, fromConfig);
 
     const revealDuration =
-      mode === "fade-quick" ? 0.8 : mode === "text-reveal" ? 0.72 : 1.05;
-    const triggerStart = mode === "fade-quick" ? "top 92%" : "top 88%";
+      mode === "fade-quick" ? 0.78 : mode === "text-reveal" ? 0.72 : 0.95;
+    const triggerStart = mode === "fade-quick" ? "top 90%" : "top 86%";
 
     gsap.to(
       element,
@@ -71,7 +71,8 @@
         scrollTrigger: {
           trigger: element,
           start: triggerStart,
-          once: true
+          once: true,
+          invalidateOnRefresh: true
         }
       }
     );
@@ -92,15 +93,16 @@
         autoAlpha: 1,
         y: 0,
         scale: 1,
-        duration: 0.95,
+        duration: 0.88,
         ease: "power3.out",
         stagger: 0.12,
         overwrite: "auto",
         clearProps: "willChange",
         scrollTrigger: {
           trigger: group,
-          start: "top 88%",
-          once: true
+          start: "top 86%",
+          once: true,
+          invalidateOnRefresh: true
         }
       });
     });
@@ -186,6 +188,19 @@
   onReady(() => {
     handleNavTap();
     runOpening();
+
+    // Recalculate trigger positions after layout stabilizes (images/fonts).
+    window.addEventListener(
+      "load",
+      () => {
+        ScrollTrigger.refresh();
+      },
+      { once: true }
+    );
+
+    window.setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 260);
   });
 
   window.setTimeout(() => {
