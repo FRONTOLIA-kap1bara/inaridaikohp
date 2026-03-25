@@ -977,7 +977,7 @@ html.js-gsap .parallax-image {
   }
 
   .gallery-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .contact-main-row {
@@ -1059,7 +1059,7 @@ html.js-gsap .parallax-image {
   .sns-gallery,
   .news-photo-ribbon,
   .gallery-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .section-decor {
@@ -1099,7 +1099,7 @@ html.js-gsap .parallax-image {
   }
 
   .gallery-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .news-all-link-wrap .primary-button {
