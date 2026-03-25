@@ -30,14 +30,23 @@ const { galleryItems, galleryMessage } = Astro.props as Props;
       galleryItems.length > 0 ? (
         <div class="gallery-grid" data-stagger="gallery">
           {galleryItems.map((item) => (
-            <figure class="gallery-photo" data-animate="zoom-in">
-              <img
-                src={item.imageUrl}
-                alt={item.imageAlt}
-                loading="lazy"
-                decoding="async"
-                class="gallery-image"
-              />
+            <figure class="gallery-photo" data-animate="fade-quick">
+              <button
+                type="button"
+                class="gallery-zoom-button"
+                data-gallery-open
+                data-image-src={item.imageUrl}
+                data-image-alt={item.imageAlt}
+                aria-label="画像を拡大表示"
+              >
+                <img
+                  src={item.imageUrl}
+                  alt={item.imageAlt}
+                  loading="lazy"
+                  decoding="async"
+                  class="gallery-image"
+                />
+              </button>
             </figure>
           ))}
         </div>
@@ -47,5 +56,50 @@ const { galleryItems, galleryMessage } = Astro.props as Props;
         </div>
       )
     }
+
+    <dialog class="gallery-lightbox" data-gallery-lightbox aria-label="画像拡大表示">
+      <div class="gallery-lightbox-content">
+        <button type="button" class="gallery-lightbox-close" data-gallery-close aria-label="閉じる">×</button>
+        <img src="" alt="" class="gallery-lightbox-image" data-gallery-image />
+      </div>
+    </dialog>
   </div>
 </section>
+
+<script>
+  const section = document.querySelector("#gallery");
+  if (!section) {
+    // no-op
+  } else {
+    const lightbox = section.querySelector("[data-gallery-lightbox]");
+    const lightboxImage = section.querySelector("[data-gallery-image]");
+    const closeButton = section.querySelector("[data-gallery-close]");
+    const openButtons = section.querySelectorAll("[data-gallery-open]");
+
+    const closeLightbox = () => {
+      if (lightbox instanceof HTMLDialogElement && lightbox.open) {
+        lightbox.close();
+      }
+    };
+
+    openButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!(lightbox instanceof HTMLDialogElement) || !(lightboxImage instanceof HTMLImageElement)) return;
+        const src = button.getAttribute("data-image-src") ?? "";
+        const alt = button.getAttribute("data-image-alt") ?? "";
+        if (!src) return;
+        lightboxImage.src = src;
+        lightboxImage.alt = alt;
+        lightbox.showModal();
+      });
+    });
+
+    closeButton?.addEventListener("click", closeLightbox);
+
+    lightbox?.addEventListener("click", (event) => {
+      if (event.target === lightbox) {
+        closeLightbox();
+      }
+    });
+  }
+</script>

@@ -33,6 +33,8 @@
         ? { ...base, x: 40 }
         : mode === "slide-right"
           ? { ...base, x: -40 }
+          : mode === "fade-quick"
+            ? { ...base, y: 8 }
           : mode === "zoom-in"
             ? { ...base, scale: 0.94 }
             : mode === "rise-blur"
@@ -47,7 +49,9 @@
 
     gsap.set(element, fromConfig);
 
-    const revealDuration = mode === "text-reveal" ? 0.72 : 1.05;
+    const revealDuration =
+      mode === "fade-quick" ? 0.8 : mode === "text-reveal" ? 0.72 : 1.05;
+    const triggerStart = mode === "fade-quick" ? "top 92%" : "top 88%";
 
     gsap.to(
       element,
@@ -66,7 +70,7 @@
         clearProps: usesClipPath ? "clipPath,willChange" : "willChange",
         scrollTrigger: {
           trigger: element,
-          start: "top 88%",
+          start: triggerStart,
           once: true
         }
       }

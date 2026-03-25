@@ -880,6 +880,81 @@ html.js-gsap .parallax-image {
   filter: none !important;
 }
 
+.gallery-zoom-button {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  margin: 0;
+  padding: clamp(0.75rem, 2vw, 1.1rem);
+  width: 100vw;
+  max-width: none;
+  height: 100vh;
+  max-height: none;
+  background: rgba(0, 0, 0, 0.78);
+}
+
+.gallery-lightbox::backdrop {
+  background: transparent;
+}
+
+.gallery-lightbox[open] {
+  display: grid;
+  place-items: center;
+}
+
+.gallery-lightbox-content {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: min(96vw, 1300px);
+  max-height: 92vh;
+  animation: gallery-zoom-in 220ms ease-out;
+}
+
+.gallery-lightbox-image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 92vh;
+  object-fit: contain;
+}
+
+.gallery-lightbox-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.7rem;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@keyframes gallery-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .gallery-empty {
   margin-top: clamp(1.8rem, 3vw, 2.4rem);
   padding: 1rem 1.2rem;
