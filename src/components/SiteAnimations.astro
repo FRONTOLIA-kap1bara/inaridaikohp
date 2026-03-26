@@ -25,31 +25,77 @@
     }
   };
 
+  const startByViewport = (desktop, tablet, mobile) => {
+    if (window.matchMedia("(max-width: 768px)").matches) return mobile;
+    if (window.matchMedia("(max-width: 1024px)").matches) return tablet;
+    return desktop;
+  };
+
   const getPreset = (mode) => {
     switch (mode) {
       case "slide-left":
-        return { from: { autoAlpha: 0, x: 40 }, start: "top 85%", duration: 0.9, ease: "power2.out" };
+        return {
+          from: { autoAlpha: 0, x: 40 },
+          start: startByViewport("top 85%", "top 80%", "top 74%"),
+          duration: 0.9,
+          ease: "power2.out"
+        };
       case "slide-right":
-        return { from: { autoAlpha: 0, x: -40 }, start: "top 85%", duration: 0.9, ease: "power2.out" };
+        return {
+          from: { autoAlpha: 0, x: -40 },
+          start: startByViewport("top 85%", "top 80%", "top 74%"),
+          duration: 0.9,
+          ease: "power2.out"
+        };
       case "zoom-in":
-        return { from: { autoAlpha: 0, scale: 0.94 }, start: "top 85%", duration: 1.0, ease: "power2.out" };
+        return {
+          from: { autoAlpha: 0, scale: 0.94 },
+          start: startByViewport("top 85%", "top 80%", "top 74%"),
+          duration: 1.0,
+          ease: "power2.out"
+        };
       case "rise-blur":
-        return { from: { autoAlpha: 0, y: 28, filter: "blur(6px)" }, start: "top 85%", duration: 1.05, ease: "power2.out" };
+        return {
+          from: { autoAlpha: 0, y: 28, filter: "blur(6px)" },
+          start: startByViewport("top 85%", "top 80%", "top 74%"),
+          duration: 1.05,
+          ease: "power2.out"
+        };
       case "clip-up":
-        return { from: { autoAlpha: 0, y: 18, clipPath: "inset(0 0 100% 0)" }, start: "top 85%", duration: 1.05, ease: "power2.out" };
+        return {
+          from: { autoAlpha: 0, y: 18, clipPath: "inset(0 0 100% 0)" },
+          start: startByViewport("top 85%", "top 80%", "top 74%"),
+          duration: 1.05,
+          ease: "power2.out"
+        };
       case "rotate-in":
         return {
           from: { autoAlpha: 0, y: 16, rotation: -2, transformOrigin: "left bottom" },
-          start: "top 85%",
+          start: startByViewport("top 85%", "top 80%", "top 74%"),
           duration: 1.0,
           ease: "power2.out"
         };
       case "text-reveal":
-        return { from: { autoAlpha: 0, y: 20 }, start: "top 86%", duration: 0.8, ease: "power2.out" };
+        return {
+          from: { autoAlpha: 0, y: 20 },
+          start: startByViewport("top 86%", "top 82%", "top 76%"),
+          duration: 0.8,
+          ease: "power2.out"
+        };
       case "fade-quick":
-        return { from: { autoAlpha: 0, y: 30 }, start: "top 93%", duration: 1.35, ease: "power2.out" };
+        return {
+          from: { autoAlpha: 0, y: 30 },
+          start: startByViewport("top 93%", "top 88%", "top 82%"),
+          duration: 1.35,
+          ease: "power2.out"
+        };
       default:
-        return { from: { autoAlpha: 0, y: 20 }, start: "top 85%", duration: 0.95, ease: "power2.out" };
+        return {
+          from: { autoAlpha: 0, y: 20 },
+          start: startByViewport("top 85%", "top 80%", "top 74%"),
+          duration: 0.95,
+          ease: "power2.out"
+        };
     }
   };
 
@@ -109,7 +155,7 @@
             clearProps: "willChange",
             scrollTrigger: {
               trigger: child,
-              start: "top 85%",
+              start: startByViewport("top 85%", "top 80%", "top 74%"),
               once: true,
               invalidateOnRefresh: true
             }
@@ -180,6 +226,32 @@
     ScrollTrigger.refresh();
   };
 
+  const setupImageRefresh = () => {
+    let timer = 0;
+    const scheduleRefresh = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+    };
+
+    document.querySelectorAll("img").forEach((image) => {
+      if (!(image instanceof HTMLImageElement)) return;
+      if (image.complete) return;
+      image.addEventListener("load", scheduleRefresh, { once: true });
+    });
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        scheduleRefresh();
+      },
+      { once: true, passive: true }
+    );
+
+    window.addEventListener("orientationchange", () => {
+      window.setTimeout(() => ScrollTrigger.refresh(), 220);
+    });
+  };
+
   const runOpening = () => {
     if (!(curtain instanceof HTMLElement) || !(root instanceof HTMLElement)) {
       initAnimations();
@@ -213,6 +285,7 @@
   onReady(() => {
     handleNavTap();
     runOpening();
+    setupImageRefresh();
 
     window.addEventListener(
       "load",
