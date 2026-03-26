@@ -8,6 +8,8 @@ type MicroCMSEnvKey =
 
 type GalleryImage = {
   url?: string;
+  width?: number;
+  height?: number;
 };
 
 export type GalleryItem = {
@@ -15,6 +17,8 @@ export type GalleryItem = {
   title: string;
   imageUrl: string;
   imageAlt: string;
+  imageWidth?: number;
+  imageHeight?: number;
   time: string;
 };
 
@@ -130,12 +134,16 @@ const toGalleryItems = (item: GalleryResponseItem): GalleryItem[] => {
   return list
     .map((asset, index) => {
       const imageUrl = typeof asset?.url === "string" ? asset.url : "";
+      const imageWidth = typeof asset?.width === "number" && asset.width > 0 ? asset.width : undefined;
+      const imageHeight = typeof asset?.height === "number" && asset.height > 0 ? asset.height : undefined;
       if (!imageUrl) return null;
       return {
         id: `${id}-${index + 1}`,
         title: list.length > 1 ? `${title} ${index + 1}` : title,
         imageUrl,
         imageAlt,
+        imageWidth,
+        imageHeight,
         time
       } satisfies GalleryItem;
     })

@@ -42,9 +42,12 @@ const { galleryItems, galleryMessage } = Astro.props as Props;
                 <img
                   src={item.imageUrl}
                   alt={item.imageAlt}
+                  width={item.imageWidth}
+                  height={item.imageHeight}
                   loading="lazy"
                   decoding="async"
                   class="gallery-image"
+                  data-gallery-image-track
                 />
               </button>
             </figure>
@@ -99,6 +102,20 @@ const { galleryItems, galleryMessage } = Astro.props as Props;
     lightbox?.addEventListener("click", (event) => {
       if (event.target === lightbox) {
         closeLightbox();
+      }
+    });
+
+    let refreshTimer = 0;
+    const scheduleRefresh = () => {
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(() => {
+        window.dispatchEvent(new Event("gallery:image-load"));
+      }, 80);
+    };
+
+    section.querySelectorAll("[data-gallery-image-track]").forEach((image) => {
+      if (image instanceof HTMLImageElement && !image.complete) {
+        image.addEventListener("load", scheduleRefresh, { once: true });
       }
     });
   }

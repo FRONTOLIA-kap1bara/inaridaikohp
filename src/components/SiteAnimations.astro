@@ -1,4 +1,4 @@
-<script>
+﻿<script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -25,36 +25,45 @@
     }
   };
 
-  const animateByMode = (element, mode) => {
+  const getPreset = (mode) => {
+    switch (mode) {
+      case "slide-left":
+        return { from: { autoAlpha: 0, x: 40 }, start: "top 85%", duration: 0.9, ease: "power2.out" };
+      case "slide-right":
+        return { from: { autoAlpha: 0, x: -40 }, start: "top 85%", duration: 0.9, ease: "power2.out" };
+      case "zoom-in":
+        return { from: { autoAlpha: 0, scale: 0.94 }, start: "top 85%", duration: 1.0, ease: "power2.out" };
+      case "rise-blur":
+        return { from: { autoAlpha: 0, y: 28, filter: "blur(6px)" }, start: "top 85%", duration: 1.05, ease: "power2.out" };
+      case "clip-up":
+        return { from: { autoAlpha: 0, y: 18, clipPath: "inset(0 0 100% 0)" }, start: "top 85%", duration: 1.05, ease: "power2.out" };
+      case "rotate-in":
+        return {
+          from: { autoAlpha: 0, y: 16, rotation: -2, transformOrigin: "left bottom" },
+          start: "top 85%",
+          duration: 1.0,
+          ease: "power2.out"
+        };
+      case "text-reveal":
+        return { from: { autoAlpha: 0, y: 20 }, start: "top 86%", duration: 0.8, ease: "power2.out" };
+      case "fade-quick":
+        return { from: { autoAlpha: 0, y: 30 }, start: "top 93%", duration: 1.35, ease: "power2.out" };
+      default:
+        return { from: { autoAlpha: 0, y: 20 }, start: "top 85%", duration: 0.95, ease: "power2.out" };
+    }
+  };
+
+  const animateElement = (element) => {
+    const mode = element.getAttribute("data-animate") ?? "fade-up";
+    const preset = getPreset(mode);
     const usesClipPath = mode === "clip-up";
-    const base = { autoAlpha: 0, force3D: true };
-    const fromConfig =
-      mode === "slide-left"
-        ? { ...base, x: 40 }
-        : mode === "slide-right"
-          ? { ...base, x: -40 }
-          : mode === "fade-quick"
-            ? { ...base, y: 26 }
-          : mode === "zoom-in"
-            ? { ...base, scale: 0.94 }
-            : mode === "rise-blur"
-              ? { ...base, y: 26, filter: "blur(6px)" }
-              : mode === "clip-up"
-                ? { ...base, y: 18, clipPath: "inset(0 0 100% 0)" }
-                : mode === "rotate-in"
-                  ? { ...base, y: 16, rotation: -2, transformOrigin: "left bottom" }
-                  : mode === "text-reveal"
-                    ? { ...base, y: 20 }
-                    : { ...base, y: 20 };
 
-    gsap.set(element, fromConfig);
-
-    const revealDuration =
-      mode === "fade-quick" ? 1.35 : mode === "text-reveal" ? 0.78 : 1.2;
-    const triggerStart = mode === "fade-quick" ? "top 78%" : "top 82%";
-
-    gsap.to(
+    gsap.fromTo(
       element,
+      {
+        ...preset.from,
+        force3D: true
+      },
       {
         autoAlpha: 1,
         x: 0,
@@ -64,13 +73,14 @@
         letterSpacing: "normal",
         filter: "blur(0px)",
         ...(usesClipPath ? { clipPath: "inset(0 0 0% 0)" } : {}),
-        duration: revealDuration,
-        ease: "power3.out",
+        duration: preset.duration,
+        ease: preset.ease,
+        immediateRender: false,
         overwrite: "auto",
         clearProps: usesClipPath ? "clipPath,willChange" : "willChange",
         scrollTrigger: {
           trigger: element,
-          start: triggerStart,
+          start: preset.start,
           once: true,
           invalidateOnRefresh: true
         }
@@ -78,35 +88,38 @@
     );
   };
 
-  const animateSections = () => {
-    document.querySelectorAll("[data-animate]").forEach((element) => {
-      const mode = element.getAttribute("data-animate") ?? "fade-up";
-      animateByMode(element, mode);
-    });
-
+  const animateStaggerChildren = () => {
     document.querySelectorAll("[data-stagger]").forEach((group) => {
       const children = Array.from(group.children).filter((child) => !child.hasAttribute("data-animate"));
       if (!children.length) return;
 
-      gsap.set(children, { autoAlpha: 0, y: 20, scale: 0.985, force3D: true });
-      gsap.to(children, {
-        autoAlpha: 1,
-        y: 0,
-        scale: 1,
-        duration: 1.15,
-        ease: "power3.out",
-        stagger: 0.18,
-        overwrite: "auto",
-        clearProps: "willChange",
-        scrollTrigger: {
-          trigger: group,
-          start: "top 82%",
-          once: true,
-          invalidateOnRefresh: true
-        }
+      children.forEach((child, index) => {
+        gsap.fromTo(
+          child,
+          { autoAlpha: 0, y: 20, scale: 0.985, force3D: true },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.05,
+            delay: index * 0.05,
+            ease: "power2.out",
+            immediateRender: false,
+            overwrite: "auto",
+            clearProps: "willChange",
+            scrollTrigger: {
+              trigger: child,
+              start: "top 85%",
+              once: true,
+              invalidateOnRefresh: true
+            }
+          }
+        );
       });
     });
+  };
 
+  const animateParallax = () => {
     document.querySelectorAll(".parallax-image").forEach((image) => {
       gsap.to(image, {
         yPercent: 8,
@@ -117,11 +130,14 @@
           trigger: image,
           start: "top bottom",
           end: "bottom top",
-          scrub: 0.8
+          scrub: 0.8,
+          invalidateOnRefresh: true
         }
       });
     });
+  };
 
+  const animateFloatingDecor = () => {
     document.querySelectorAll("[data-float]").forEach((shape) => {
       const speed = shape.getAttribute("data-float") === "fast" ? 14 : 22;
       gsap.to(shape, {
@@ -139,9 +155,10 @@
   const handleNavTap = () => {
     document.querySelectorAll(".nav-link").forEach((link) => {
       link.addEventListener("click", (event) => {
-        const href = link.getAttribute("href");
-        if (!href || !href.startsWith("#")) return;
-        const target = document.querySelector(href);
+        const href = link.getAttribute("href") ?? "";
+        const hash = href.startsWith("#") ? href : href.startsWith("/#") ? href.slice(1) : "";
+        if (!hash) return;
+        const target = document.querySelector(hash);
         if (!target) return;
         event.preventDefault();
         target.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -152,15 +169,23 @@
   const initAnimations = () => {
     gsap.killTweensOf("[data-animate], [data-stagger] > *, .parallax-image, [data-float]");
     ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    animateSections();
+
+    document.querySelectorAll("[data-animate]").forEach((element) => {
+      animateElement(element);
+    });
+
+    animateStaggerChildren();
+    animateParallax();
+    animateFloatingDecor();
     ScrollTrigger.refresh();
   };
 
   const runOpening = () => {
-    if (!curtain || !root) {
+    if (!(curtain instanceof HTMLElement) || !(root instanceof HTMLElement)) {
       initAnimations();
       return;
     }
+
     root.style.opacity = "1";
     initAnimations();
 
@@ -189,24 +214,29 @@
     handleNavTap();
     runOpening();
 
-    // Recalculate trigger positions after layout stabilizes (images/fonts).
     window.addEventListener(
       "load",
       () => {
-        initAnimations();
+        ScrollTrigger.refresh();
       },
       { once: true }
     );
 
-    window.setTimeout(() => {
-      initAnimations();
-    }, 320);
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(() => ScrollTrigger.refresh());
+    }
+
+    window.addEventListener("gallery:image-load", () => {
+      ScrollTrigger.refresh();
+    });
   });
 
   window.setTimeout(() => {
     if (curtain instanceof HTMLElement && curtain.style.opacity !== "0") {
       revealFallback();
-      initAnimations();
+      if (!ScrollTrigger.getAll().length) {
+        initAnimations();
+      }
     }
-  }, 1200);
+  }, 1400);
 </script>

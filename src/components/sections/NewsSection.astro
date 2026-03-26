@@ -41,7 +41,7 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
       </p>
     </div>
 
-    <div class="news-layout" data-animate="fade-up">
+    <div class="news-layout">
       <div class="news-feed" data-stagger="news">
         {
           newsItems.length > 0 ? (
@@ -93,11 +93,7 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
       </aside>
     </div>
 
-    <div
-      class={`news-photo-ribbon news-photo-ribbon-${Math.min(newsImages.length, 2) || 1}`}
-      data-stagger="gallery"
-      data-animate="fade-up"
-    >
+    <div class={`news-photo-ribbon news-photo-ribbon-${Math.min(newsImages.length, 2) || 1}`} data-stagger="gallery">
       {
         newsImages.map((entry, index) => (
           <figure
