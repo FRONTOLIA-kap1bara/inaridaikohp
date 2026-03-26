@@ -105,18 +105,29 @@ const { galleryItems, galleryMessage } = Astro.props as Props;
       }
     });
 
-    let refreshTimer = 0;
-    const scheduleRefresh = () => {
-      window.clearTimeout(refreshTimer);
-      refreshTimer = window.setTimeout(() => {
-        window.dispatchEvent(new Event("gallery:image-load"));
-      }, 80);
-    };
+    const trackedImages = Array.from(section.querySelectorAll("[data-gallery-image-track]")).filter(
+      (image): image is HTMLImageElement => image instanceof HTMLImageElement
+    );
 
-    section.querySelectorAll("[data-gallery-image-track]").forEach((image) => {
-      if (image instanceof HTMLImageElement && !image.complete) {
-        image.addEventListener("load", scheduleRefresh, { once: true });
-      }
-    });
+    let pending = trackedImages.filter((image) => !image.complete).length;
+    const dispatchLoaded = () => window.dispatchEvent(new Event("gallery:image-load"));
+
+    if (pending === 0) {
+      dispatchLoaded();
+    } else {
+      trackedImages.forEach((image) => {
+        if (image.complete) return;
+        image.addEventListener(
+          "load",
+          () => {
+            pending -= 1;
+            if (pending <= 0) {
+              dispatchLoaded();
+            }
+          },
+          { once: true }
+        );
+      });
+    }
   }
 </script>

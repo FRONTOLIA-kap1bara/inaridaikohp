@@ -3,6 +3,7 @@
   import { ScrollTrigger } from "gsap/ScrollTrigger";
 
   gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true });
   document.documentElement.classList.add("js-gsap");
 
   const curtain = document.querySelector("#opening-curtain");
@@ -226,32 +227,6 @@
     ScrollTrigger.refresh();
   };
 
-  const setupImageRefresh = () => {
-    let timer = 0;
-    const scheduleRefresh = () => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => ScrollTrigger.refresh(), 120);
-    };
-
-    document.querySelectorAll("img").forEach((image) => {
-      if (!(image instanceof HTMLImageElement)) return;
-      if (image.complete) return;
-      image.addEventListener("load", scheduleRefresh, { once: true });
-    });
-
-    window.addEventListener(
-      "scroll",
-      () => {
-        scheduleRefresh();
-      },
-      { once: true, passive: true }
-    );
-
-    window.addEventListener("orientationchange", () => {
-      window.setTimeout(() => ScrollTrigger.refresh(), 220);
-    });
-  };
-
   const runOpening = () => {
     if (!(curtain instanceof HTMLElement) || !(root instanceof HTMLElement)) {
       initAnimations();
@@ -285,7 +260,6 @@
   onReady(() => {
     handleNavTap();
     runOpening();
-    setupImageRefresh();
 
     window.addEventListener(
       "load",
@@ -299,8 +273,16 @@
       document.fonts.ready.then(() => ScrollTrigger.refresh());
     }
 
-    window.addEventListener("gallery:image-load", () => {
-      ScrollTrigger.refresh();
+    window.addEventListener(
+      "gallery:image-load",
+      () => {
+        ScrollTrigger.refresh();
+      },
+      { once: true }
+    );
+
+    window.addEventListener("orientationchange", () => {
+      window.setTimeout(() => ScrollTrigger.refresh(), 220);
     });
   });
 
