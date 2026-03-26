@@ -1,0 +1,89 @@
+---
+import "../styles/global.css";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/sections/Header.astro";
+
+const pageTitle = "このサイトについて | 威鳴太鼓│豊川高校和太鼓部";
+const pageDescription =
+  "威鳴太鼓（豊川高校和太鼓部）公式サイトについてのご案内ページです。";
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  keywords="このサイトについて,威鳴太鼓,豊川高校和太鼓部,サイト案内"
+  canonicalPath="/about"
+>
+  <Header />
+  <main class="section-frame section-info">
+    <div class="section-inner">
+      <div class="section-head">
+        <p class="section-label">ABOUT THIS SITE</p>
+        <h1 class="section-title">このサイトについて</h1>
+        <p class="section-intro">
+          このページでは、威鳴太鼓（豊川高校和太鼓部）公式サイトの概要をご案内しています。
+        </p>
+      </div>
+
+      <section class="panel-lacquer mt-6 p-6">
+        <div class="prose-ja text-[rgba(16,16,16,0.86)]">
+          <h2 class="font-title text-2xl">当サイトについて</h2>
+
+          <h3 class="font-title mt-8 text-xl">① 存在意義</h3>
+          <p>
+            当サイトは、豊川高校和太鼓部の最新ニュースやSNS、演奏依頼に関する情報を掲載し、学校内外の皆様に向けて情報発信を行うことを目的としております。
+          </p>
+
+          <hr class="my-6 border-[rgba(16,16,16,0.2)]" />
+
+          <h3 class="font-title text-xl">② 運営体制</h3>
+          <p>
+            当サイトは、豊川高等学校和太鼓部の許可を得て、部員の一人が運営している「FRONTOLIAインターネット」が運営・制作・管理を行っております。
+          </p>
+          <p>
+            また、最新のニュースおよび写真につきましては、豊川高等学校和太鼓部顧問が管理できる体制となっております。
+          </p>
+          <p>2026年度 3年生作成</p>
+
+          <hr class="my-6 border-[rgba(16,16,16,0.2)]" />
+
+          <h3 class="font-title text-xl">③ 使用技術</h3>
+          <p>
+            当サイトは、Astroを主軸とし、GSAPによるアニメーションを取り入れたJamstack構成で構築されています。
+          </p>
+          <p>
+            サーバーにはCloudflare Workersを使用しており、ニュース、写真、およびギャラリーセクションにはmicroCMSを採用しています。
+          </p>
+          <p>
+            各サービスの詳細および利用規約については、それぞれの公式サイトをご確認ください。
+          </p>
+
+          <hr class="my-6 border-[rgba(16,16,16,0.2)]" />
+
+          <h3 class="font-title text-xl">④ 著作権</h3>
+          <p>
+            当サイトに掲載されている和太鼓部の写真の著作権は、豊川高等学校和太鼓部に帰属します。
+          </p>
+          <p>
+            また、当サイトのプログラムおよびコード等の著作権は、FRONTOLIAインターネットに帰属します。
+          </p>
+
+          <hr class="my-6 border-[rgba(16,16,16,0.2)]" />
+
+          <h3 class="font-title text-xl">⑤ ドメイン</h3>
+          <p>
+            当サイトのドメインは、FRONTOLIAインターネットが契約しているものを使用しております。
+          </p>
+          <p>
+            なお、FRONTOLIAインターネットは豊川高等学校とは直接の関係を有する団体ではありません。
+          </p>
+
+          <hr class="my-6 border-[rgba(16,16,16,0.2)]" />
+
+          <p>© FRONTOLIAインターネット</p>
+          <p>© 豊川高等学校和太鼓部</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</BaseLayout>

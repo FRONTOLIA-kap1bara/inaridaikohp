@@ -121,8 +121,25 @@ const structuredDataList = [
     <div id="site-root">
       <slot />
       <footer class="px-4 py-6 text-center text-xs tracking-[0.08em] text-[rgba(16,16,16,0.72)]">
+        <nav class="mb-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
+          <a href="/about" class="underline decoration-[rgba(16,16,16,0.45)] underline-offset-4 hover:text-[rgba(16,16,16,0.9)]">
+            このサイトについて
+          </a>
+          <a
+            href="https://inari-hue.frontolia.com"
+            class="underline decoration-[rgba(16,16,16,0.45)] underline-offset-4 hover:text-[rgba(16,16,16,0.9)]"
+          >
+            笛運指表一覧サイト
+          </a>
+          <a
+            href="https://shinobue.frontolia.com"
+            class="underline decoration-[rgba(16,16,16,0.45)] underline-offset-4 hover:text-[rgba(16,16,16,0.9)]"
+          >
+            篠笛運指表作成アプリ
+          </a>
+        </nav>
         <p class="mb-2">当サイトで使用している画像等は著作権の関係上、無断で使用することを禁じます。</p>
-        (c) 2026 FRONTOLIA インターネット 豊川高校和太鼓部 All Rights Reserved
+        ©2026 FRONTOLIA インターネット 豊川高校和太鼓部 All Rights Reserved
       </footer>
     </div>
   </body>
