@@ -50,7 +50,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">`,
     `<channel>`,
-    `<title>${escapeXml("威鳴太鼓│豊川高校和太鼓部 - ニュース")}</title>`,
+    `<title>${escapeXml("豊川高校和太鼓部公式サイト│「威鳴太鼓」 - ニュース")}</title>`,
     `<link>${escapeXml(siteUrl)}</link>`,
     `<description>${escapeXml("威鳴太鼓（豊川高校和太鼓部）の最新ニュースを配信しています。")}</description>`,
     `<language>ja-JP</language>`,

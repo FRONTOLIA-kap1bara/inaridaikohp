@@ -47,7 +47,6 @@ const { galleryItems, galleryMessage } = Astro.props as Props;
                   loading="lazy"
                   decoding="async"
                   class="gallery-image"
-                  data-gallery-image-track
                 />
               </button>
             </figure>
@@ -105,29 +104,7 @@ const { galleryItems, galleryMessage } = Astro.props as Props;
       }
     });
 
-    const trackedImages = Array.from(section.querySelectorAll("[data-gallery-image-track]")).filter(
-      (image): image is HTMLImageElement => image instanceof HTMLImageElement
-    );
-
-    let pending = trackedImages.filter((image) => !image.complete).length;
-    const dispatchLoaded = () => window.dispatchEvent(new Event("gallery:image-load"));
-
-    if (pending === 0) {
-      dispatchLoaded();
-    } else {
-      trackedImages.forEach((image) => {
-        if (image.complete) return;
-        image.addEventListener(
-          "load",
-          () => {
-            pending -= 1;
-            if (pending <= 0) {
-              dispatchLoaded();
-            }
-          },
-          { once: true }
-        );
-      });
-    }
+    // no-op: gallery image load handling is intentionally omitted to avoid
+    // extra scroll-trigger refresh work on mobile scrolling.
   }
 </script>

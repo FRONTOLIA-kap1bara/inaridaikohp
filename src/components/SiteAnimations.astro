@@ -26,91 +26,81 @@
     }
   };
 
-  const startByViewport = (desktop, tablet, mobile) => {
-    if (window.matchMedia("(max-width: 768px)").matches) return mobile;
-    if (window.matchMedia("(max-width: 1024px)").matches) return tablet;
-    return desktop;
+  const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
+  const isTablet = () => window.matchMedia("(max-width: 1024px)").matches;
+
+  const startForMode = (mode) => {
+    if (isMobile()) return mode === "fade-quick" ? "top 70%" : "top 68%";
+    if (isTablet()) return mode === "fade-quick" ? "top 62%" : "top 56%";
+    return mode === "fade-quick" ? "top 90%" : "top 84%";
   };
 
-  const getPreset = (mode) => {
-    switch (mode) {
-      case "slide-left":
-        return {
-          from: { autoAlpha: 0, x: 40 },
-          start: startByViewport("top 85%", "top 80%", "top 74%"),
-          duration: 0.9,
-          ease: "power2.out"
-        };
-      case "slide-right":
-        return {
-          from: { autoAlpha: 0, x: -40 },
-          start: startByViewport("top 85%", "top 80%", "top 74%"),
-          duration: 0.9,
-          ease: "power2.out"
-        };
-      case "zoom-in":
-        return {
-          from: { autoAlpha: 0, scale: 0.94 },
-          start: startByViewport("top 85%", "top 80%", "top 74%"),
+  const staggerStart = () => {
+    if (isMobile()) return "top 68%";
+    if (isTablet()) return "top 56%";
+    return "top 84%";
+  };
+
+  let refreshQueued = false;
+  const queueRefresh = () => {
+    if (refreshQueued) return;
+    refreshQueued = true;
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        refreshQueued = false;
+        ScrollTrigger.refresh();
+      });
+    });
+  };
+
+  const animateByMode = (element, mode) => {
+    const inHeroSection = Boolean(element.closest("#home"));
+    if (inHeroSection) {
+      const heroTargets = Array.from(document.querySelectorAll("#home [data-animate]"));
+      const heroIndex = heroTargets.indexOf(element);
+      gsap.fromTo(
+        element,
+        { autoAlpha: 0 },
+        {
+          autoAlpha: 1,
           duration: 1.0,
-          ease: "power2.out"
-        };
-      case "rise-blur":
-        return {
-          from: { autoAlpha: 0, y: 28, filter: "blur(6px)" },
-          start: startByViewport("top 85%", "top 80%", "top 74%"),
-          duration: 1.05,
-          ease: "power2.out"
-        };
-      case "clip-up":
-        return {
-          from: { autoAlpha: 0, y: 18, clipPath: "inset(0 0 100% 0)" },
-          start: startByViewport("top 85%", "top 80%", "top 74%"),
-          duration: 1.05,
-          ease: "power2.out"
-        };
-      case "rotate-in":
-        return {
-          from: { autoAlpha: 0, y: 16, rotation: -2, transformOrigin: "left bottom" },
-          start: startByViewport("top 85%", "top 80%", "top 74%"),
-          duration: 1.0,
-          ease: "power2.out"
-        };
-      case "text-reveal":
-        return {
-          from: { autoAlpha: 0, y: 20 },
-          start: startByViewport("top 86%", "top 82%", "top 76%"),
-          duration: 0.8,
-          ease: "power2.out"
-        };
-      case "fade-quick":
-        return {
-          from: { autoAlpha: 0, y: 30 },
-          start: startByViewport("top 93%", "top 88%", "top 82%"),
-          duration: 1.35,
-          ease: "power2.out"
-        };
-      default:
-        return {
-          from: { autoAlpha: 0, y: 20 },
-          start: startByViewport("top 85%", "top 80%", "top 74%"),
-          duration: 0.95,
-          ease: "power2.out"
-        };
+          delay: heroIndex >= 0 ? heroIndex * 0.12 : 0,
+          ease: "power2.out",
+          immediateRender: false,
+          overwrite: "auto",
+          clearProps: "willChange"
+        }
+      );
+      return;
     }
-  };
 
-  const animateElement = (element) => {
-    const mode = element.getAttribute("data-animate") ?? "fade-up";
-    const preset = getPreset(mode);
     const usesClipPath = mode === "clip-up";
+    const base = { autoAlpha: 0, force3D: true };
+    const fromConfig =
+      mode === "slide-left"
+        ? { ...base, x: 40 }
+        : mode === "slide-right"
+          ? { ...base, x: -40 }
+          : mode === "zoom-in"
+            ? { ...base, scale: 0.94 }
+            : mode === "rise-blur"
+              ? { ...base, y: 26, filter: "blur(6px)" }
+              : mode === "clip-up"
+                ? { ...base, y: 18, clipPath: "inset(0 0 100% 0)" }
+                : mode === "rotate-in"
+                  ? { ...base, y: 16, rotation: -2, transformOrigin: "left bottom" }
+                  : mode === "text-reveal"
+                    ? { ...base, y: 20 }
+                    : mode === "fade-quick"
+                      ? { ...base, y: 30 }
+                      : { ...base, y: 20 };
+
+    const revealDuration =
+      mode === "fade-quick" ? 1.25 : mode === "text-reveal" ? 0.78 : 1.0;
 
     gsap.fromTo(
       element,
-      {
-        ...preset.from,
-        force3D: true
-      },
+      fromConfig,
       {
         autoAlpha: 1,
         x: 0,
@@ -120,14 +110,14 @@
         letterSpacing: "normal",
         filter: "blur(0px)",
         ...(usesClipPath ? { clipPath: "inset(0 0 0% 0)" } : {}),
-        duration: preset.duration,
-        ease: preset.ease,
+        duration: revealDuration,
+        ease: "power3.out",
         immediateRender: false,
         overwrite: "auto",
         clearProps: usesClipPath ? "clipPath,willChange" : "willChange",
         scrollTrigger: {
           trigger: element,
-          start: preset.start,
+          start: startForMode(mode),
           once: true,
           invalidateOnRefresh: true
         }
@@ -135,7 +125,12 @@
     );
   };
 
-  const animateStaggerChildren = () => {
+  const animateSections = () => {
+    document.querySelectorAll("[data-animate]").forEach((element) => {
+      const mode = element.getAttribute("data-animate") ?? "fade-up";
+      animateByMode(element, mode);
+    });
+
     document.querySelectorAll("[data-stagger]").forEach((group) => {
       const children = Array.from(group.children).filter((child) => !child.hasAttribute("data-animate"));
       if (!children.length) return;
@@ -148,15 +143,15 @@
             autoAlpha: 1,
             y: 0,
             scale: 1,
-            duration: 1.05,
-            delay: index * 0.05,
-            ease: "power2.out",
+            duration: 0.95,
+            delay: index * 0.04,
+            ease: "power3.out",
             immediateRender: false,
             overwrite: "auto",
             clearProps: "willChange",
             scrollTrigger: {
               trigger: child,
-              start: startByViewport("top 85%", "top 80%", "top 74%"),
+              start: staggerStart(),
               once: true,
               invalidateOnRefresh: true
             }
@@ -164,9 +159,7 @@
         );
       });
     });
-  };
 
-  const animateParallax = () => {
     document.querySelectorAll(".parallax-image").forEach((image) => {
       gsap.to(image, {
         yPercent: 8,
@@ -182,9 +175,7 @@
         }
       });
     });
-  };
 
-  const animateFloatingDecor = () => {
     document.querySelectorAll("[data-float]").forEach((shape) => {
       const speed = shape.getAttribute("data-float") === "fast" ? 14 : 22;
       gsap.to(shape, {
@@ -216,19 +207,12 @@
   const initAnimations = () => {
     gsap.killTweensOf("[data-animate], [data-stagger] > *, .parallax-image, [data-float]");
     ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-
-    document.querySelectorAll("[data-animate]").forEach((element) => {
-      animateElement(element);
-    });
-
-    animateStaggerChildren();
-    animateParallax();
-    animateFloatingDecor();
-    ScrollTrigger.refresh();
+    animateSections();
+    queueRefresh();
   };
 
   const runOpening = () => {
-    if (!(curtain instanceof HTMLElement) || !(root instanceof HTMLElement)) {
+    if (!curtain || !root) {
       initAnimations();
       return;
     }
@@ -264,25 +248,17 @@
     window.addEventListener(
       "load",
       () => {
-        ScrollTrigger.refresh();
+        queueRefresh();
       },
       { once: true }
     );
 
     if (document.fonts?.ready) {
-      document.fonts.ready.then(() => ScrollTrigger.refresh());
+      document.fonts.ready.then(() => queueRefresh());
     }
 
-    window.addEventListener(
-      "gallery:image-load",
-      () => {
-        ScrollTrigger.refresh();
-      },
-      { once: true }
-    );
-
     window.addEventListener("orientationchange", () => {
-      window.setTimeout(() => ScrollTrigger.refresh(), 220);
+      window.setTimeout(() => queueRefresh(), 220);
     });
   });
 

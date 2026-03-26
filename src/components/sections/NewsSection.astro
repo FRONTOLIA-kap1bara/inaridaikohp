@@ -103,6 +103,8 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
             <img
               src={entry.image.src}
               alt="豊川和太鼓ニュース関連写真"
+              width={entry.image.width}
+              height={entry.image.height}
               loading="lazy"
               decoding="async"
               class="h-full w-full object-cover"

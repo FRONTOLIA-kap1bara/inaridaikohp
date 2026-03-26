@@ -74,6 +74,8 @@ const { infoImages } = Astro.props as Props;
             <img
               src={entry.image.src}
               alt="威鳴太鼓の活動写真"
+              width={entry.image.width}
+              height={entry.image.height}
               loading="lazy"
               decoding="async"
               class="parallax-image h-full w-full object-cover"
@@ -87,6 +89,8 @@ const { infoImages } = Astro.props as Props;
             <img
               src={infoImages[0].image.src}
               alt="威鳴太鼓の活動写真"
+              width={infoImages[0].image.width}
+              height={infoImages[0].image.height}
               loading="lazy"
               decoding="async"
               class="parallax-image h-full w-full object-cover"
