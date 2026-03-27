@@ -103,6 +103,13 @@ html.js-gsap .parallax-image {
     radial-gradient(circle at center, rgba(143, 27, 43, 0.2), transparent 60%);
 }
 
+.hero-content-wrap {
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-items: center;
+  justify-content: center;
+}
+
 .hero-copy h1 {
   text-shadow: 0 10px 35px rgba(0, 0, 0, 0.65);
 }
@@ -1066,6 +1073,12 @@ html.js-gsap .parallax-image {
 }
 
 @media (max-width: 768px) {
+  .hero-content-wrap {
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: clamp(6.5rem, 18vh, 9rem);
+  }
+
   .site-header {
     position: sticky !important;
     top: 0;
