@@ -37,8 +37,196 @@
       <p class="mt-1">このサイト内のお問い合わせはFRONTOLIAインターネットまでお寄せください。</p>
       <p class="mt-1">
         メール：
-        <a class="mail-link" href="mailto:contact@frontolia.com">contact@frontolia.com</a>
+        <a id="contact-frontolia-mail" class="mail-link" href="mailto:contact@frontolia.com">contact@frontolia.com</a>
       </p>
     </div>
   </div>
+  <div
+    id="contact-mail-modal"
+    class="ios-modal"
+    hidden
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="contact-mail-modal-title"
+    aria-describedby="contact-mail-modal-description"
+  >
+    <div class="ios-modal__backdrop" data-close-modal></div>
+    <div class="ios-modal__panel" role="document">
+      <div class="ios-modal__content">
+        <p id="contact-mail-modal-title" class="ios-modal__title">注意</p>
+        <p id="contact-mail-modal-description" class="ios-modal__message">
+          このメールアドレスでは豊川高校和太鼓部への出演依頼や質問等は
+          <span class="ios-modal__danger-text">受け付けておりません</span>。こちらは代理で作成・運営している団体へのお問い合わせアドレスです。
+        </p>
+      </div>
+      <div class="ios-modal__actions">
+        <button type="button" class="ios-modal__button ios-modal__button--confirm" data-confirm-modal>お問い合わせ</button>
+        <button type="button" class="ios-modal__button ios-modal__button--cancel" data-cancel-modal>キャンセル</button>
+      </div>
+    </div>
+  </div>
+  <script is:inline>
+    const contactMailLink = document.getElementById("contact-frontolia-mail");
+    const contactMailModal = document.getElementById("contact-mail-modal");
+    const confirmButton = contactMailModal?.querySelector("[data-confirm-modal]");
+    const cancelButton = contactMailModal?.querySelector("[data-cancel-modal]");
+    const backdrop = contactMailModal?.querySelector("[data-close-modal]");
+
+    const openModal = () => {
+      if (!contactMailModal) return;
+      contactMailModal.hidden = false;
+      contactMailModal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("contact-mail-modal-open");
+
+      requestAnimationFrame(() => {
+        contactMailModal.classList.add("is-open");
+      });
+    };
+
+    const closeModal = () => {
+      if (!contactMailModal) return;
+      contactMailModal.classList.remove("is-open");
+      contactMailModal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("contact-mail-modal-open");
+
+      window.setTimeout(() => {
+        contactMailModal.hidden = true;
+      }, 180);
+    };
+
+    if (contactMailLink && contactMailModal) {
+      contactMailLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        openModal();
+      });
+
+      confirmButton?.addEventListener("click", () => {
+        window.location.href = contactMailLink.href;
+        closeModal();
+      });
+
+      cancelButton?.addEventListener("click", closeModal);
+      backdrop?.addEventListener("click", closeModal);
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !contactMailModal.hidden) {
+          closeModal();
+        }
+      });
+    }
+  </script>
+  <style>
+    :global(body.contact-mail-modal-open) {
+      overflow: hidden;
+    }
+
+    .ios-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+
+    .ios-modal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .ios-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.36);
+      backdrop-filter: blur(3px);
+    }
+
+    .ios-modal__panel {
+      position: relative;
+      width: min(360px, calc(100vw - 2rem));
+      border-radius: 14px;
+      background: rgba(245, 245, 247, 0.95);
+      color: #1f1f21;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
+      overflow: hidden;
+      transform: translateY(8px) scale(0.98);
+      transition: transform 0.18s ease;
+    }
+
+    .ios-modal.is-open .ios-modal__panel {
+      transform: translateY(0) scale(1);
+    }
+
+    .ios-modal__content {
+      padding: 1rem 1rem 0.9rem;
+      text-align: center;
+    }
+
+    .ios-modal__title {
+      margin: 0;
+      font-size: 1.06rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: #d70015;
+    }
+
+    .ios-modal__message {
+      margin: 0.5rem 0 0;
+      font-size: 0.92rem;
+      line-height: 1.52;
+      color: #2c2c2e;
+    }
+
+    .ios-modal__actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid rgba(60, 60, 67, 0.28);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .ios-modal__button {
+      appearance: none;
+      border: 0;
+      margin: 0;
+      padding: 0.78rem 0.7rem;
+      background: transparent;
+      font-size: 1.02rem;
+      line-height: 1.2;
+      cursor: pointer;
+      color: #007aff;
+      transition: background-color 0.14s ease;
+    }
+
+    .ios-modal__button:hover {
+      background: rgba(0, 122, 255, 0.08);
+    }
+
+    .ios-modal__button:active {
+      background: rgba(0, 122, 255, 0.14);
+    }
+
+    .ios-modal__button--cancel {
+      color: #3a3a3c;
+      border-left: 1px solid rgba(60, 60, 67, 0.28);
+    }
+
+    .ios-modal__button--confirm {
+      font-weight: 600;
+    }
+
+    .ios-modal__danger-text {
+      color: #d70015;
+      font-weight: 700;
+    }
+
+    @media (max-width: 420px) {
+      .ios-modal__message {
+        font-size: 0.88rem;
+      }
+    }
+  </style>
 </section>
