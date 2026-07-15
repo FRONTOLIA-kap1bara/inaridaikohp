@@ -33,16 +33,106 @@ const { heroImages } = Astro.props as Props;
 
   <div class="hero-content-wrap relative z-10 mx-auto flex w-[min(1120px,92%)]">
     <div class="hero-copy max-w-4xl px-2 text-center text-white">
-      <p class="mb-4 text-sm tracking-[0.25em] text-white/85 sm:text-base">
+      <p class="hero-kicker mb-4 text-sm tracking-[0.25em] text-white/85 sm:text-base">
         豊川高校和太鼓部 威鳴太鼓
       </p>
       <h1 class="font-title text-4xl leading-tight sm:text-6xl" data-animate="text-reveal">
         笑顔と元気で伝統の響きを
       </h1>
-      <p class="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base" data-animate="fade-up">
+      <p class="hero-lead mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base" data-animate="fade-up">
         心を震わせる一打を、和の誇りとともに。響きが重なるたび、会場をひとつにする威鳴太鼓の世界へ。
       </p>
       <a class="hero-subtle-button mt-6 sm:mt-8" href="#contact" data-animate="fade-up">演奏依頼はこちら</a>
+
+      <div
+        class="retirement-countdown"
+        data-countdown
+        data-target="2026-07-19T13:30:00+09:00"
+        data-animate="fade-up"
+        role="timer"
+        aria-label="引退ステージ開演までのカウントダウン"
+      >
+        <p class="countdown-event-title">豊川高校和太鼓部引退ステージ「朱咲く」</p>
+        <p class="countdown-event-date">
+          <time datetime="2026-07-19T13:30:00+09:00">2026.07.19 SUN / 13:30</time>
+        </p>
+
+        <div data-countdown-active>
+          <p class="countdown-days" aria-hidden="true">
+            <span class="countdown-days-prefix">あと</span><span class="countdown-days-number" data-countdown-days>--</span><span class="countdown-days-unit">日</span>
+          </p>
+          <p class="countdown-time" aria-hidden="true">
+            <span data-countdown-hours>--</span><span class="countdown-time-unit">時間</span>
+            <span data-countdown-minutes>--</span><span class="countdown-time-unit">分</span>
+            <span data-countdown-seconds>--</span><span class="countdown-time-unit">秒</span>
+          </p>
+        </div>
+
+        <p class="countdown-stage-now" data-stage-now hidden>STAGE NOW!</p>
+        <p class="sr-only" data-countdown-announcement aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  const countdownElements = document.querySelectorAll<HTMLElement>("[data-countdown]");
+
+  countdownElements.forEach((countdown) => {
+    const targetTime = Date.parse(countdown.dataset.target ?? "");
+    const daysElement = countdown.querySelector<HTMLElement>("[data-countdown-days]");
+    const hoursElement = countdown.querySelector<HTMLElement>("[data-countdown-hours]");
+    const minutesElement = countdown.querySelector<HTMLElement>("[data-countdown-minutes]");
+    const secondsElement = countdown.querySelector<HTMLElement>("[data-countdown-seconds]");
+    const activeElement = countdown.querySelector<HTMLElement>("[data-countdown-active]");
+    const stageNowElement = countdown.querySelector<HTMLElement>("[data-stage-now]");
+    const announcementElement = countdown.querySelector<HTMLElement>("[data-countdown-announcement]");
+
+    if (
+      !Number.isFinite(targetTime) ||
+      !daysElement ||
+      !hoursElement ||
+      !minutesElement ||
+      !secondsElement ||
+      !activeElement ||
+      !stageNowElement
+    ) {
+      return;
+    }
+
+    const padTime = (value: number) => String(value).padStart(2, "0");
+
+    const updateCountdown = () => {
+      const remainingMilliseconds = targetTime - Date.now();
+
+      if (remainingMilliseconds <= 0) {
+        activeElement.hidden = true;
+        stageNowElement.hidden = false;
+        countdown.classList.add("is-stage-now");
+        countdown.setAttribute("aria-label", "STAGE NOW! 引退ステージ開催中");
+        if (announcementElement) announcementElement.textContent = "STAGE NOW! 引退ステージが開演しました。";
+        return;
+      }
+
+      const totalSeconds = Math.ceil(remainingMilliseconds / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      daysElement.textContent = String(days);
+      hoursElement.textContent = padTime(hours);
+      minutesElement.textContent = padTime(minutes);
+      secondsElement.textContent = padTime(seconds);
+      countdown.setAttribute(
+        "aria-label",
+        `引退ステージ開演まで、あと${days}日${hours}時間${minutes}分${seconds}秒`
+      );
+
+      const delayUntilNextSecond = 1000 - (Date.now() % 1000) + 20;
+      window.setTimeout(updateCountdown, delayUntilNextSecond);
+    };
+
+    updateCountdown();
+  });
+</script>
