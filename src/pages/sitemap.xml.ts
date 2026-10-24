@@ -31,15 +31,10 @@ const buildUrlNode = (entry: SitemapEntry) => {
   return lines.join("");
 };
 
-export const GET: APIRoute = async ({ url, locals }) => {
+export const GET: APIRoute = async ({ url }) => {
   const origin = `${url.protocol}//${url.host}`;
-  const runtimeEnv =
-    typeof locals === "object" && locals && "runtime" in locals
-      ? (locals as { runtime?: { env?: unknown } }).runtime?.env
-      : undefined;
-
   const nowIso = new Date().toISOString();
-  const news = await fetchNews(undefined, runtimeEnv);
+  const news = await fetchNews();
   const latestNewsIso = toValidLastmod(news.items[0]?.time) ?? nowIso;
   const entries: SitemapEntry[] = [
     {

@@ -204,7 +204,7 @@ https://toyokawa.ed.jp/club/japanesedrum
 ニュースは **microCMS** を使用して管理します。
 
 
-APIはこちらです「UnVQWVH2SuqRnDbeGH28hYuaWaEQuLsPSbTG」
+APIはこちらです「[削除済み：Cloudflare Secrets / ローカル環境変数で管理]」
 詳しいAPIは「C:\Users\ka3pi\Documents\Codex\inaridaikoHP」にある「api-news-20260315171524.json」を確認してください。
 * APIキーは安全に管理できる設計にする
 

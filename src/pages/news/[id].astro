@@ -3,6 +3,7 @@ import "../../styles/global.css";
 import { fetchNewsById, formatDate, getCategoryLabel, stripHtml, toSummary } from "../../lib/news";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/sections/Header.astro";
+import { sanitizeNewsHtml } from "../../lib/sanitize-news";
 
 export const prerender = false;
 
@@ -13,7 +14,7 @@ if (!item) {
   Astro.response.status = 404;
 }
 const title = item?.title ?? "ニュース詳細";
-const htmlContent = item?.content ?? "";
+const htmlContent = sanitizeNewsHtml(item?.content ?? "");
 const plainContent = stripHtml(htmlContent);
 const categoryLabel = getCategoryLabel(item?.category);
 const dateLabel = formatDate(item?.time ?? "");

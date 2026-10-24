@@ -1,5 +1,6 @@
 /// <reference types="astro/client" />
 import { getSecret } from "astro:env/server";
+import { fetchCmsJson, isCmsId, isRecord, resolveCmsEndpoint } from "./microcms";
 
 type NewsCategory = {
   id?: string;
@@ -14,16 +15,9 @@ export type NewsItem = {
   category?: NewsCategory | string | null;
 };
 
-type NewsResponse = {
-  contents?: NewsItem[];
-  totalCount?: number;
-  limit?: number;
-  offset?: number;
-};
-
-type NewsDetailResponse = NewsItem & {
-  message?: string;
-};
+const isNewsItem = (value: unknown): value is NewsItem => isRecord(value) &&
+  isCmsId(value.id) && typeof value.title === "string" &&
+  typeof value.content === "string" && typeof value.time === "string";
 
 export type NewsFetchResult = {
   items: NewsItem[];
@@ -115,45 +109,15 @@ export const formatDate = (value: string) => {
 };
 
 const resolveNewsEndpoint = (serviceOrUrl: string, limit: number, offset = 0) => {
-  const trimmed = serviceOrUrl.trim();
-  const query = `limit=${limit}&offset=${offset}&orders=-time&depth=1`;
-
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    const url = new URL(trimmed);
-    const normalizedPath = url.pathname.endsWith("/") ? url.pathname.slice(0, -1) : url.pathname;
-    const isNewsEndpoint = normalizedPath.endsWith("/api/v1/news");
-    if (isNewsEndpoint) {
-      url.search = query;
-      return url.toString();
-    }
-
-    return `${url.origin}/api/v1/news?${query}`;
-  }
-
-  const domain = trimmed.replace(/\.microcms\.io$/i, "");
-  return `https://${domain}.microcms.io/api/v1/news?${query}`;
+  const url = resolveCmsEndpoint(serviceOrUrl, "news");
+  url.search = new URLSearchParams({ limit: String(limit), offset: String(offset), orders: "-time", depth: "1" }).toString();
+  return url;
 };
 
 const resolveNewsDetailEndpoint = (serviceOrUrl: string, id: string) => {
-  const trimmed = serviceOrUrl.trim();
-  const encodedId = encodeURIComponent(id);
-  const query = "depth=1";
-
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    const url = new URL(trimmed);
-    const normalizedPath = url.pathname.endsWith("/") ? url.pathname.slice(0, -1) : url.pathname;
-    const isNewsEndpoint = normalizedPath.endsWith("/api/v1/news");
-    if (isNewsEndpoint) {
-      url.pathname = `${normalizedPath}/${encodedId}`;
-      url.search = query;
-      return url.toString();
-    }
-
-    return `${url.origin}/api/v1/news/${encodedId}?${query}`;
-  }
-
-  const domain = trimmed.replace(/\.microcms\.io$/i, "");
-  return `https://${domain}.microcms.io/api/v1/news/${encodedId}?${query}`;
+  const url = resolveCmsEndpoint(serviceOrUrl, "news", id);
+  url.search = "depth=1";
+  return url;
 };
 
 export async function fetchNews(limit?: number, runtimeEnv?: unknown): Promise<NewsFetchResult> {
@@ -175,6 +139,8 @@ export async function fetchNews(limit?: number, runtimeEnv?: unknown): Promise<N
   const collected: NewsItem[] = [];
 
   try {
+    const signal = AbortSignal.timeout(10_000);
+    const budget = { remainingBytes: 4 * 1024 * 1024 };
     while (offset < totalCount && collected.length < targetCount) {
       if (pageFetchCount >= MAX_PAGE_FETCHES) {
         break;
@@ -186,40 +152,28 @@ export async function fetchNews(limit?: number, runtimeEnv?: unknown): Promise<N
         ? Math.max(1, Math.min(DEFAULT_PAGE_LIMIT, remaining))
         : DEFAULT_PAGE_LIMIT;
       const endpoint = resolveNewsEndpoint(serviceDomain, pageLimit, offset);
-      const response = await fetch(endpoint, {
-        method: "GET",
-        headers: {
-          "X-MICROCMS-API-KEY": apiKey
-        }
-      });
-
-      if (!response.ok) {
-        return {
-          items: [],
-          source: "fallback",
-          message: FALLBACK_MESSAGES.fetchFailed
-        };
+      const json = await fetchCmsJson(endpoint, apiKey, signal, budget);
+      if (!isRecord(json) || !Array.isArray(json.contents) || json.contents.length > pageLimit) {
+        throw new Error("Invalid CMS news page");
       }
+      const pageItems = json.contents.filter(isNewsItem);
 
-      const json = (await response.json()) as NewsResponse;
-      const pageItems = Array.isArray(json.contents) ? json.contents : [];
-
-      if (typeof json.totalCount === "number") {
+      if (typeof json.totalCount === "number" && Number.isSafeInteger(json.totalCount) && json.totalCount >= 0) {
         totalCount = json.totalCount;
       }
 
-      if (pageItems.length === 0) {
+      if (json.contents.length === 0) {
         break;
       }
 
       collected.push(...pageItems);
-      const nextOffset = offset + pageItems.length;
+      const nextOffset = offset + json.contents.length;
       if (nextOffset <= offset) {
         break;
       }
       offset = nextOffset;
 
-      if (pageItems.length < pageLimit) {
+      if (json.contents.length < pageLimit) {
         break;
       }
     }
@@ -240,26 +194,14 @@ export async function fetchNews(limit?: number, runtimeEnv?: unknown): Promise<N
 export async function fetchNewsById(id: string, runtimeEnv?: unknown): Promise<NewsItem | null> {
   const { serviceDomain, apiKey } = resolveMicroCMSEnv(runtimeEnv);
 
-  if (!id || !serviceDomain || !apiKey) {
+  if (!isCmsId(id) || !serviceDomain || !apiKey) {
     return null;
   }
 
-  const endpoint = resolveNewsDetailEndpoint(serviceDomain, id);
-
   try {
-    const response = await fetch(endpoint, {
-      method: "GET",
-      headers: {
-        "X-MICROCMS-API-KEY": apiKey
-      }
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const json = (await response.json()) as NewsDetailResponse;
-    if (!json?.id || !json?.title || !json?.content || !json?.time) {
+    const endpoint = resolveNewsDetailEndpoint(serviceDomain, id);
+    const json = await fetchCmsJson(endpoint, apiKey, AbortSignal.timeout(10_000));
+    if (!isNewsItem(json) || json.id !== id) {
       return null;
     }
 

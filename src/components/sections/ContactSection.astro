@@ -66,9 +66,9 @@
       </div>
     </div>
   </div>
-  <script is:inline>
-    const contactMailLink = document.getElementById("contact-frontolia-mail");
-    const contactMailModal = document.getElementById("contact-mail-modal");
+  <script>
+    const contactMailLink = document.querySelector<HTMLAnchorElement>("#contact-frontolia-mail");
+    const contactMailModal = document.querySelector<HTMLElement>("#contact-mail-modal");
     const confirmButton = contactMailModal?.querySelector("[data-confirm-modal]");
     const cancelButton = contactMailModal?.querySelector("[data-cancel-modal]");
     const backdrop = contactMailModal?.querySelector("[data-close-modal]");

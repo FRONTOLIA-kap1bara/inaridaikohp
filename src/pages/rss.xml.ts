@@ -14,16 +14,11 @@ const toRfc822Date = (value: string | undefined) => {
   return Number.isNaN(date.getTime()) ? new Date().toUTCString() : date.toUTCString();
 };
 
-export const GET: APIRoute = async ({ url, locals }) => {
+export const GET: APIRoute = async ({ url }) => {
   const origin = `${url.protocol}//${url.host}`;
-  const runtimeEnv =
-    typeof locals === "object" && locals && "runtime" in locals
-      ? (locals as { runtime?: { env?: unknown } }).runtime?.env
-      : undefined;
-
   const feedUrl = `${origin}/rss.xml`;
   const siteUrl = `${origin}/`;
-  const news = await fetchNews(50, runtimeEnv);
+  const news = await fetchNews(50);
   const latestPubDate = toRfc822Date(news.items[0]?.time);
 
   const itemsXml = news.items

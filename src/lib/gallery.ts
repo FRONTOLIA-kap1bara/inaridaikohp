@@ -1,5 +1,6 @@
 ﻿/// <reference types="astro/client" />
 import { getSecret } from "astro:env/server";
+import { fetchCmsJson, isCmsId, isImageUrl, isRecord, resolveCmsEndpoint } from "./microcms";
 
 type MicroCMSEnvKey =
   | "MICROCMS_SERVICE_DOMAIN_GALLERY"
@@ -33,10 +34,6 @@ type GalleryResponseItem = {
   time?: string;
   publishedAt?: string;
   createdAt?: string;
-};
-
-type GalleryResponse = {
-  contents?: GalleryResponseItem[];
 };
 
 export type GalleryFetchResult = {
@@ -83,28 +80,9 @@ const sortByNewest = (items: GalleryItem[]) =>
   [...items].sort((a, b) => toTimestamp(b.time) - toTimestamp(a.time));
 
 const resolveGalleryEndpoint = (serviceOrUrl: string, limit: number) => {
-  const trimmed = serviceOrUrl.replace(/\s+/g, "").trim();
-  const query = `limit=${limit}&orders=-time&depth=1`;
-
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    const url = new URL(trimmed);
-    const normalizedPath = url.pathname.endsWith("/") ? url.pathname.slice(0, -1) : url.pathname;
-    const isGalleryEndpoint = normalizedPath.endsWith("/api/v1/gallery");
-    if (isGalleryEndpoint) {
-      url.search = query;
-      return url.toString();
-    }
-
-    const maybeEndpoint = `${url.origin}${normalizedPath}`;
-    if (maybeEndpoint.endsWith("/api/v1")) {
-      return `${maybeEndpoint}/gallery?${query}`;
-    }
-
-    return `${url.origin}/api/v1/gallery?${query}`;
-  }
-
-  const domain = trimmed.replace(/\.microcms\.io$/i, "");
-  return `https://${domain}.microcms.io/api/v1/gallery?${query}`;
+  const url = resolveCmsEndpoint(serviceOrUrl, "gallery");
+  url.search = new URLSearchParams({ limit: String(limit), orders: "-time", depth: "1" }).toString();
+  return url;
 };
 
 const toGalleryItems = (item: GalleryResponseItem): GalleryItem[] => {
@@ -125,18 +103,18 @@ const toGalleryItems = (item: GalleryResponseItem): GalleryItem[] => {
           ? item.createdAt
           : "";
 
-  if (!id) return [];
+  if (!isCmsId(id)) return [];
 
   const list = Array.isArray(item.gallery)
     ? item.gallery
     : [item.image, item.photo].filter((image): image is GalleryImage => Boolean(image));
 
   return list
-    .map((asset, index) => {
+    .map((asset, index): GalleryItem | null => {
       const imageUrl = typeof asset?.url === "string" ? asset.url : "";
       const imageWidth = typeof asset?.width === "number" && asset.width > 0 ? asset.width : undefined;
       const imageHeight = typeof asset?.height === "number" && asset.height > 0 ? asset.height : undefined;
-      if (!imageUrl) return null;
+      if (!isImageUrl(imageUrl)) return null;
       return {
         id: `${id}-${index + 1}`,
         title: list.length > 1 ? `${title} ${index + 1}` : title,
@@ -162,24 +140,14 @@ export async function fetchGallery(limit = 8, runtimeEnv?: unknown): Promise<Gal
   }
 
   try {
-    const endpoint = resolveGalleryEndpoint(serviceDomain, Math.max(1, limit));
-    const response = await fetch(endpoint, {
-      method: "GET",
-      headers: {
-        "X-MICROCMS-API-KEY": apiKey
-      }
-    });
-
-    if (!response.ok) {
-      return {
-        items: [],
-        source: "fallback",
-        message: FALLBACK_MESSAGES.fetchFailed
-      };
+    const safeLimit = Number.isFinite(limit) ? Math.max(1, Math.min(100, Math.floor(limit))) : 8;
+    const endpoint = resolveGalleryEndpoint(serviceDomain, safeLimit);
+    const json = await fetchCmsJson(endpoint, apiKey, AbortSignal.timeout(10_000));
+    if (!isRecord(json) || !Array.isArray(json.contents) || json.contents.length > safeLimit) {
+      throw new Error("Invalid CMS gallery page");
     }
-
-    const json = (await response.json()) as GalleryResponse;
-    const items = (Array.isArray(json.contents) ? json.contents : [])
+    const items = json.contents
+      .filter(isRecord)
       .flatMap((item) => toGalleryItems(item))
       .filter((item): item is GalleryItem => Boolean(item));
 
