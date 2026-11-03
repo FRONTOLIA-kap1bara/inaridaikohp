@@ -1,4 +1,4 @@
-﻿---
+---
 import "../styles/global.css";
 import type { ImageMetadata } from "astro";
 import { fetchNews, formatDate, getCategoryLabel, toSummary } from "../lib/news";
@@ -93,7 +93,7 @@ fillMissingImages(infoImages, 3);
 fillMissingImages(newsImages, 2);
 fillMissingImages(snsImages, 3);
 
-const newsResult = await fetchNews();
+const [newsResult, galleryResult] = await Promise.all([fetchNews(5), fetchGallery(8)]);
 const topNewsItems = newsResult.items.slice(0, 5).map((item) => ({
   id: item.id,
   title: item.title,
@@ -104,7 +104,6 @@ const topNewsItems = newsResult.items.slice(0, 5).map((item) => ({
 }));
 
 const newsMessage = newsResult.message ?? "現在、ニュースは準備中です。";
-const galleryResult = await fetchGallery(8);
 const galleryItems = galleryResult.items;
 const galleryMessage = galleryResult.message ?? "現在、ギャラリーは準備中です。";
 

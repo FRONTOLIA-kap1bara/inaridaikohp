@@ -1,5 +1,7 @@
-﻿---
+---
 import type { ImageMetadata } from "astro";
+import OptimizedImage from "../OptimizedImage.astro";
+import WaBackdrop from "../WaBackdrop.astro";
 
 type NewsImage = {
   name: string;
@@ -25,20 +27,11 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
 ---
 
 <section id="news" class="section-frame section-news">
+  <WaBackdrop />
   <div class="section-inner">
-    <div class="section-decor">
-      <span class="decor-orb decor-orb-c" data-float="slow"></span>
-      <span class="decor-ring decor-ring-b" data-float="fast"></span>
-      <span class="decor-pill decor-pill-b" data-float="slow"></span>
-      <span class="decor-line"></span>
-    </div>
-
     <div class="section-head section-head-light" data-animate="clip-up">
       <p class="section-label">NEWS</p>
       <h2 class="section-title">最新ニュース</h2>
-      <p class="section-intro">
-        お知らせを最新順で表示しています。タイトルまたは本文の抜粋をクリックすると詳細ページで全文を確認できます。
-      </p>
     </div>
 
     <div class="news-layout">
@@ -93,22 +86,20 @@ const { newsItems, newsMessage, newsImages } = Astro.props as Props;
       </aside>
     </div>
 
-    <div class={`news-photo-ribbon news-photo-ribbon-${Math.min(newsImages.length, 2) || 1}`} data-stagger="gallery">
+    <div class={`news-photo-ribbon news-photo-ribbon-${Math.min(newsImages.length, 2) || 1}`}>
       {
         newsImages.map((entry, index) => (
           <figure
             class={`photo-frame news-photo framed-photo ${index === 0 ? "news-photo-wide" : ""} ${index === 1 ? "news-photo-contain" : ""}`}
-            data-animate="clip-up"
+            data-animate="photo-reveal"
           >
-            <img
-              src={entry.image.src}
+            <div class="photo-window"><OptimizedImage
+              name={entry.name}
+              image={entry.image}
               alt="豊川和太鼓ニュース関連写真"
-              width={entry.image.width}
-              height={entry.image.height}
               loading="lazy"
               decoding="async"
-              class="h-full w-full object-cover"
-            />
+            /></div>
           </figure>
         ))
       }

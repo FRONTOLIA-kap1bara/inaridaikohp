@@ -1,5 +1,9 @@
 ---
 import type { ImageMetadata } from "astro";
+import OptimizedImage from "../OptimizedImage.astro";
+import InstagramIcon from "../InstagramIcon.astro";
+import ExternalLinkIcon from "../ExternalLinkIcon.astro";
+import WaBackdrop from "../WaBackdrop.astro";
 
 type SnsImage = {
   name: string;
@@ -14,65 +18,66 @@ const { snsImages } = Astro.props as Props;
 ---
 
 <section id="sns" class="section-frame section-sns">
+  <WaBackdrop />
   <div class="section-inner">
-    <div class="section-decor">
-      <span class="decor-orb decor-orb-d" data-float="fast"></span>
-      <span class="decor-ring decor-ring-c" data-float="slow"></span>
-      <span class="decor-pill decor-pill-c" data-float="fast"></span>
-      <span class="decor-grid"></span>
-    </div>
-
     <div class="section-head" data-animate="clip-up">
       <p class="section-label">SNS</p>
       <h2 class="section-title">公式SNS</h2>
       <p class="section-intro">
-        ステージの熱量を日常へ。動画・写真・出演案内は公式SNSで発信しています。
+        演奏の様子や、部活の日常をお届け。動画・写真・出演のお知らせはこちらから！
       </p>
     </div>
 
-    <div class="sns-links" data-stagger="links">
+    <div class="sns-links">
       <a
         href="https://www.instagram.com/toyokawa_wadaiko"
         target="_blank"
         rel="noopener noreferrer"
         class="sns-card sns-card-ig"
-        data-animate="rise-blur"
+        data-animate="pop-in"
       >
-        <p class="sns-tag">OFFICIAL INSTAGRAM</p>
-        <p class="font-title text-2xl">Instagram</p>
-        <p class="mt-3 text-sm text-[#f2efe8]/85">演奏動画やイベント情報を配信中</p>
-        <p class="mt-6 text-sm text-[var(--color-gold)]">@toyokawa_wadaiko</p>
+        <span class="social-logo social-logo-instagram"><InstagramIcon /></span>
+        <span class="social-link-copy">
+          <span class="social-link-label">公式 Instagram</span>
+          <span class="social-link-description">演奏動画・写真・出演のお知らせ</span>
+          <span class="social-link-action">Instagramを開く <ExternalLinkIcon class="external-link-icon" /></span>
+        </span>
+        <span class="sr-only">（新しいタブで開きます）</span>
       </a>
       <a
         href="https://toyokawa.ed.jp/club/japanesedrum"
         target="_blank"
         rel="noopener noreferrer"
         class="sns-card sns-card-school"
-        data-animate="rise-blur"
+        data-animate="pop-in"
       >
-        <p class="sns-tag">SCHOOL PAGE</p>
-        <p class="font-title text-2xl">豊川高校和太鼓部紹介ページ</p>
-        <p class="mt-3 text-sm text-[#f2efe8]/85">学校公式サイト内の部活動紹介ページ</p>
-        <p class="mt-6 text-sm text-[var(--color-gold)]">toyokawa.ed.jp/club/japanesedrum</p>
+        <span class="social-logo social-logo-school">
+          <img src="/images/toyokawa-school-logo.svg" alt="豊川高等学校の校章" width="58" height="55" loading="lazy" />
+        </span>
+        <span class="social-link-copy">
+          <span class="social-link-label">豊川高校 和太鼓部紹介</span>
+          <span class="social-link-description">学校公式サイトの部活動紹介</span>
+          <span class="social-link-action">学校公式サイトへ <ExternalLinkIcon class="external-link-icon" /></span>
+        </span>
+        <span class="sr-only">（新しいタブで開きます）</span>
       </a>
     </div>
 
-    <div class={`sns-gallery sns-gallery-${snsImages.length >= 3 ? 3 : snsImages.length || 1}`} data-stagger="gallery">
+    <div class="sns-gallery">
       {
-        snsImages.map((entry, index) => (
+        snsImages.map((entry) => (
           <figure
-            class={`photo-frame sns-photo framed-photo ${index === 1 ? "sns-photo-tall" : ""} ${index === 0 ? "sns-photo-main" : ""}`}
-            data-animate="zoom-in"
+            class="photo-frame sns-photo framed-photo"
+            data-animate="photo-reveal"
           >
-            <img
-              src={entry.image.src}
+            <div class="photo-window"><OptimizedImage
+              name={entry.name}
+              image={entry.image}
+              sizes="(max-width: 768px) 94vw, 33vw"
               alt="威鳴太鼓のSNS掲載写真"
-              width={entry.image.width}
-              height={entry.image.height}
               loading="lazy"
               decoding="async"
-              class="h-full w-full object-cover"
-            />
+            /></div>
           </figure>
         ))
       }

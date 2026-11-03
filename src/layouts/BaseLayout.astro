@@ -1,4 +1,4 @@
-﻿---
+---
 interface Props {
   title: string;
   description: string;
@@ -98,13 +98,14 @@ const structuredDataList = [
     <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
     <link rel="sitemap" type="application/xml" href={new URL("/sitemap.xml", Astro.url.origin).toString()} />
     <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS`} href={new URL("/rss.xml", Astro.url.origin).toString()} />
-    <link rel="icon" type="image/jpeg" href="/images/logo.jpg" />
-    <link rel="apple-touch-icon" href="/images/logo.jpg" />
-    <link rel="shortcut icon" href="/images/logo.jpg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Noto+Serif+JP:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap"
       rel="stylesheet"
     />
     {
@@ -117,10 +118,10 @@ const structuredDataList = [
     }
   </head>
   <body class="bg-[var(--color-paper)] text-[var(--color-ink)]">
-    <div id="opening-curtain" class="fixed inset-0 z-[100] bg-black"></div>
     <div id="site-root">
       <slot />
       <footer class="px-4 py-6 text-center text-xs tracking-[0.08em] text-[rgba(16,16,16,0.72)]">
+        <p class="mb-5 leading-relaxed">この公式サイトは顧問の許可を得て部員が作成及び運営しております。</p>
         <nav class="mb-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
           <a href="/about" class="underline decoration-[rgba(16,16,16,0.45)] underline-offset-4 hover:text-[rgba(16,16,16,0.9)]">
             このサイトについて

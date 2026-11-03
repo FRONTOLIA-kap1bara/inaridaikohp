@@ -1,273 +1,117 @@
-﻿<script>
+<script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
 
   gsap.registerPlugin(ScrollTrigger);
-  ScrollTrigger.config({ ignoreMobileResize: true });
-  document.documentElement.classList.add("js-gsap");
-
-  const curtain = document.querySelector("#opening-curtain");
-  const root = document.querySelector<HTMLElement>("#site-root");
-
-  const revealFallback = () => {
-    if (root instanceof HTMLElement) root.style.opacity = "1";
-    if (curtain instanceof HTMLElement) {
-      curtain.style.opacity = "0";
-      curtain.style.visibility = "hidden";
-      curtain.style.pointerEvents = "none";
-    }
-  };
-
-  const onReady = (callback: () => void) => {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", callback, { once: true });
-    } else {
-      callback();
-    }
-  };
-
-  const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
-  const isTablet = () => window.matchMedia("(max-width: 1024px)").matches;
-
-  const startForMode = (mode: string) => {
-    if (isMobile()) return mode === "fade-quick" ? "top 70%" : "top 68%";
-    if (isTablet()) return mode === "fade-quick" ? "top 62%" : "top 56%";
-    return mode === "fade-quick" ? "top 90%" : "top 84%";
-  };
-
-  const staggerStart = () => {
-    if (isMobile()) return "top 68%";
-    if (isTablet()) return "top 56%";
-    return "top 84%";
-  };
-
-  let refreshQueued = false;
-  const queueRefresh = () => {
-    if (refreshQueued) return;
-    refreshQueued = true;
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        refreshQueued = false;
-        ScrollTrigger.refresh();
-      });
-    });
-  };
-
-  const animateByMode = (element: Element, mode: string) => {
-    const inHeroSection = Boolean(element.closest("#home"));
-    if (inHeroSection) {
-      const heroTargets = Array.from(document.querySelectorAll("#home [data-animate]"));
-      const heroIndex = heroTargets.indexOf(element);
-      gsap.fromTo(
-        element,
-        { autoAlpha: 0 },
-        {
-          autoAlpha: 1,
-          duration: 1.0,
-          delay: heroIndex >= 0 ? heroIndex * 0.12 : 0,
-          ease: "power2.out",
-          immediateRender: false,
-          overwrite: "auto",
-          clearProps: "willChange"
-        }
-      );
-      return;
-    }
-
-    const usesClipPath = mode === "clip-up";
-    const base = { autoAlpha: 0, force3D: true };
-    const fromConfig =
-      mode === "slide-left"
-        ? { ...base, x: 40 }
-        : mode === "slide-right"
-          ? { ...base, x: -40 }
-          : mode === "zoom-in"
-            ? { ...base, scale: 0.94 }
-            : mode === "rise-blur"
-              ? { ...base, y: 26, filter: "blur(6px)" }
-              : mode === "clip-up"
-                ? { ...base, y: 18, clipPath: "inset(0 0 100% 0)" }
-                : mode === "rotate-in"
-                  ? { ...base, y: 16, rotation: -2, transformOrigin: "left bottom" }
-                  : mode === "text-reveal"
-                    ? { ...base, y: 20 }
-                    : mode === "fade-quick"
-                      ? { ...base, y: 30 }
-                      : { ...base, y: 20 };
-
-    const revealDuration =
-      mode === "fade-quick" ? 1.25 : mode === "text-reveal" ? 0.78 : 1.0;
-
-    gsap.fromTo(
-      element,
-      fromConfig,
-      {
-        autoAlpha: 1,
-        x: 0,
-        y: 0,
-        scale: 1,
-        rotation: 0,
-        letterSpacing: "normal",
-        filter: "blur(0px)",
-        ...(usesClipPath ? { clipPath: "inset(0 0 0% 0)" } : {}),
-        duration: revealDuration,
-        ease: "power3.out",
-        immediateRender: false,
-        overwrite: "auto",
-        clearProps: usesClipPath ? "clipPath,willChange" : "willChange",
-        scrollTrigger: {
-          trigger: element,
-          start: startForMode(mode),
-          once: true,
-          invalidateOnRefresh: true
-        }
-      }
-    );
-  };
-
-  const animateSections = () => {
-    document.querySelectorAll("[data-animate]").forEach((element) => {
-      const mode = element.getAttribute("data-animate") ?? "fade-up";
-      animateByMode(element, mode);
-    });
-
-    document.querySelectorAll("[data-stagger]").forEach((group) => {
-      const children = Array.from(group.children).filter((child) => !child.hasAttribute("data-animate"));
-      if (!children.length) return;
-
-      children.forEach((child, index) => {
-        gsap.fromTo(
-          child,
-          { autoAlpha: 0, y: 20, scale: 0.985, force3D: true },
-          {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.95,
-            delay: index * 0.04,
-            ease: "power3.out",
-            immediateRender: false,
-            overwrite: "auto",
-            clearProps: "willChange",
-            scrollTrigger: {
-              trigger: child,
-              start: staggerStart(),
-              once: true,
-              invalidateOnRefresh: true
-            }
-          }
-        );
-      });
-    });
-
-    document.querySelectorAll(".parallax-image").forEach((image) => {
-      gsap.to(image, {
-        yPercent: 8,
-        scale: 1.05,
-        ease: "none",
-        force3D: true,
-        scrollTrigger: {
-          trigger: image,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.8,
-          invalidateOnRefresh: true
-        }
-      });
-    });
-
-    document.querySelectorAll("[data-float]").forEach((shape) => {
-      const speed = shape.getAttribute("data-float") === "fast" ? 14 : 22;
-      gsap.to(shape, {
-        y: -14,
-        x: 8,
-        rotate: 4,
-        repeat: -1,
-        yoyo: true,
-        duration: speed,
-        ease: "sine.inOut"
-      });
-    });
-  };
-
-  const handleNavTap = () => {
-    document.querySelectorAll(".nav-link").forEach((link) => {
-      link.addEventListener("click", (event) => {
-        const href = link.getAttribute("href") ?? "";
-        const hash = href.startsWith("#") ? href : href.startsWith("/#") ? href.slice(1) : "";
-        if (!hash) return;
-        const target = document.querySelector(hash);
-        if (!target) return;
-        event.preventDefault();
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    });
-  };
-
-  const initAnimations = () => {
-    gsap.killTweensOf("[data-animate], [data-stagger] > *, .parallax-image, [data-float]");
-    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    animateSections();
-    queueRefresh();
-  };
-
-  const runOpening = () => {
-    if (!curtain || !root) {
-      initAnimations();
-      return;
-    }
-
-    root.style.opacity = "1";
-    initAnimations();
-
-    gsap
-      .timeline()
-      .to(curtain, {
-        opacity: 0,
-        duration: 0.45,
-        ease: "power2.out"
-      })
-      .to(
-        root,
-        {
-          opacity: 1,
-          duration: 0.35,
-          ease: "power2.out",
-          onComplete: () => {
-            curtain.remove();
-          }
-        },
-        "-=0.2"
-      );
-  };
-
-  onReady(() => {
-    handleNavTap();
-    runOpening();
-
-    window.addEventListener(
-      "load",
-      () => {
-        queueRefresh();
-      },
-      { once: true }
-    );
-
-    if (document.fonts?.ready) {
-      document.fonts.ready.then(() => queueRefresh());
-    }
-
-    window.addEventListener("orientationchange", () => {
-      window.setTimeout(() => queueRefresh(), 220);
-    });
+  ScrollTrigger.config({
+    ignoreMobileResize: true,
+    autoRefreshEvents: "visibilitychange,DOMContentLoaded,resize"
   });
 
-  window.setTimeout(() => {
-    if (curtain instanceof HTMLElement && curtain.style.opacity !== "0") {
-      revealFallback();
-      if (!ScrollTrigger.getAll().length) {
-        initAnimations();
+  const startAnimations = () => {
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      const mobile = window.matchMedia("(max-width: 768px)").matches;
+      const tablet = window.matchMedia("(max-width: 1024px)").matches;
+
+      document.querySelectorAll<HTMLElement>("[data-animate]").forEach((element) => {
+        const mode = element.dataset.animate;
+        const inGallery = Boolean(element.closest("#gallery"));
+        const photo = mode === "photo-reveal";
+        const pop = mode === "pop-in";
+        const galleryPhoto = inGallery && mode === "fade-quick";
+        const galleryHeading = inGallery && mode === "clip-up";
+        const start = inGallery
+          ? mobile ? "top 68%" : tablet ? galleryPhoto ? "top 62%" : "top 56%" : galleryPhoto ? "top 90%" : "top 84%"
+          : photo ? "top 80%" : "top 82%";
+
+        element.dataset.revealState = "pending";
+        gsap.fromTo(element, {
+          autoAlpha: 0,
+          y: galleryPhoto ? 30 : galleryHeading ? 18 : photo ? 52 : 36,
+          scale: photo ? 0.96 : pop ? 0.94 : 1,
+          ...(galleryHeading ? { clipPath: "inset(0 0 100% 0)" } : {})
+        }, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: galleryPhoto ? 1.25 : photo ? 1.15 : 0.95,
+          ease: pop ? "back.out(1.15)" : "power2.out",
+          ...(galleryHeading ? { clipPath: "inset(0 0 0% 0)" } : {}),
+          onStart: () => { element.dataset.revealState = "running"; },
+          onComplete: () => { element.dataset.revealState = "shown"; },
+          onReverseComplete: () => { element.dataset.revealState = "pending"; },
+          scrollTrigger: {
+            trigger: element,
+            start,
+            end: "bottom top",
+            once: inGallery,
+            toggleActions: inGallery ? "play none none none" : "play none none reverse",
+            invalidateOnRefresh: true
+          }
+        });
+      });
+
+      document.querySelectorAll<HTMLElement>("[data-stagger] > :not([data-animate])").forEach((element) => {
+        gsap.fromTo(element, { autoAlpha: 0, y: 28 }, {
+          autoAlpha: 1, y: 0, duration: 0.9, ease: "power2.out",
+          scrollTrigger: {
+            trigger: element, start: "top 82%", end: "bottom top",
+            toggleActions: "play none none reverse"
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-float]").forEach((shape) => {
+        gsap.to(shape, {
+          y: shape.closest(".wa-backdrop") ? -10 : -14,
+          x: 6,
+          rotation: 2,
+          repeat: -1,
+          yoyo: true,
+          duration: shape.getAttribute("data-float") === "fast" ? 7 : 12,
+          ease: "sine.inOut",
+          scrollTrigger: {
+            trigger: shape.closest("section"),
+            start: "top bottom", end: "bottom top",
+            toggleActions: "play pause resume pause"
+          }
+        });
+      });
+
+      return () => {
+        document.querySelectorAll<HTMLElement>("[data-reveal-state]").forEach((element) => {
+          delete element.dataset.revealState;
+        });
+      };
+    });
+
+    // Refresh positions without restarting animations when fonts and lazy images settle.
+    let refreshTimer: ReturnType<typeof setTimeout>;
+    const refreshWhenIdle = () => {
+      // Recalculating mid-scroll interrupts native smooth navigation to section anchors.
+      if (ScrollTrigger.isScrolling()) {
+        refreshTimer = setTimeout(refreshWhenIdle, 160);
+        return;
       }
-    }
-  }, 1400);
+      ScrollTrigger.refresh();
+    };
+    const refresh = () => {
+      clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(refreshWhenIdle, 160);
+    };
+    document.fonts?.ready.then(refresh);
+    document.querySelectorAll("img[loading='lazy']").forEach((image) => {
+      if (!(image instanceof HTMLImageElement) || image.complete) return;
+      if (image.hasAttribute("width") && image.hasAttribute("height")) return;
+      image.addEventListener("load", refresh, { once: true });
+    });
+    window.addEventListener("load", refresh, { once: true });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startAnimations, { once: true });
+  } else {
+    startAnimations();
+  }
 </script>

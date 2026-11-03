@@ -7,7 +7,10 @@
     "node": ">=24.22.1 <25"
   },
   "scripts": {
-    "dev": "astro dev",
+    "images:optimize": "node scripts/optimize-images.mjs",
+    "predev": "npm run images:optimize",
+    "dev": "node scripts/dev.mjs",
+    "prebuild": "npm run images:optimize",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -34,6 +37,7 @@
     "@astrojs/check": "0.9.12",
     "@types/hast": "3.0.5",
     "@types/node": "24.19.2",
+    "sharp": "0.35.5",
     "typescript": "6.0.3"
   },
   "overrides": {

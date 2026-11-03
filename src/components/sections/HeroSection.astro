@@ -1,5 +1,6 @@
 ---
 import type { ImageMetadata } from "astro";
+import OptimizedImage from "../OptimizedImage.astro";
 
 type HeroImage = {
   name: string;
@@ -17,10 +18,13 @@ const { heroImages } = Astro.props as Props;
   <div class="hero-slideshow" aria-hidden="true">
     {
       heroImages.map((entry, index) => (
-        <figure class="hero-slide" style={`--slide-index:${index};`}>
-          <img
-            src={entry.image.src}
+        <figure class="hero-slide" style={`--slide-delay:${index * 6 - 2.4}s;`}>
+          <OptimizedImage
+            name={entry.name}
+            image={entry.image}
+            sizes="100vw"
             alt=""
+            fetchpriority={index === 0 ? "high" : "low"}
             loading={index === 0 ? "eager" : "lazy"}
             decoding="async"
             class="h-full w-full object-cover"
@@ -36,13 +40,13 @@ const { heroImages } = Astro.props as Props;
       <p class="mb-4 text-sm tracking-[0.25em] text-white/85 sm:text-base">
         豊川高校和太鼓部 威鳴太鼓
       </p>
-      <h1 class="font-title text-4xl leading-tight sm:text-6xl" data-animate="text-reveal">
+      <h1 class="hero-reveal font-title text-4xl leading-tight sm:text-6xl">
         笑顔と元気で伝統の響きを
       </h1>
-      <p class="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base" data-animate="fade-up">
+      <p class="hero-reveal hero-reveal-description mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
         心を震わせる一打を、和の誇りとともに。響きが重なるたび、会場をひとつにする威鳴太鼓の世界へ。
       </p>
-      <a class="hero-subtle-button mt-6 sm:mt-8" href="#contact" data-animate="fade-up">演奏依頼はこちら</a>
+      <a class="hero-reveal hero-reveal-link hero-subtle-button mt-6 sm:mt-8" href="#contact">演奏依頼はこちら</a>
     </div>
   </div>
 </section>
